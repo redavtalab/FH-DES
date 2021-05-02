@@ -14,15 +14,11 @@ import sklearn.preprocessing as preprocessing
 import scipy.io as sio
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import Perceptron
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler
-
 from deslib.dcs import LCA
 from deslib.dcs import MLA
 from deslib.dcs import OLA
 from deslib.dcs import MCB
 from deslib.dcs import Rank
-
 from deslib.des import DESKNN
 from deslib.des import KNORAE
 from deslib.des import KNORAU
@@ -39,7 +35,6 @@ import pickle
 
 def plot_classifier_decision(ax, clf, X, mode='line', **params):
     xx, yy = make_grid(X[:, 0], X[:, 1])
-
     Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
     if mode == 'line':
@@ -48,7 +43,6 @@ def plot_classifier_decision(ax, clf, X, mode='line', **params):
         ax.contourf(xx, yy, Z, **params)
     ax.set_xlim((np.min(X[:, 0]), np.max(X[:, 0])))
     ax.set_ylim((np.min(X[:, 1]), np.max(X[:, 0])))
-
 
 def plot_dataset(X, y, ax=None, title=None, **params):
     if ax is None:
@@ -76,14 +70,12 @@ def plot_dataset(X, y, ax=None, title=None, **params):
 
     return ax
 
-
 def make_grid(x, y, h=.01):
     x_min, x_max = x.min() - 0, x.max() + 0
     y_min, y_max = y.min() - 0, y.max() + 0
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
                          np.arange(y_min, y_max, h))
     return xx, yy
-
 
 # Prepare the DS techniques. Changing k value to 7.
 def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
@@ -114,11 +106,11 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
 
 # %% Parameters
 
-theta = .03
-NO_Hyperbox_Thereshold = 0.95
+theta = .1
+NO_Hyperbox_Thereshold = 0.9
 classifiers_max_depth = 3
 NO_classifiers = 100
-no_itr = 1
+no_itr = 20
 
 # %% ###############################################################################
 # Generating the dataset and training the pool of classifiers.
@@ -131,7 +123,6 @@ rng = np.random.RandomState(ran)
 X, y = X, y = make_P2([1000, 1000], random_state=rng)
 
 # X = preprocessing.MinMaxScaler().fit_transform(X)
-
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=rng)
 X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=rng)

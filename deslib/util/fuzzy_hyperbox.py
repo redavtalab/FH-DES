@@ -9,9 +9,9 @@ class Hyperbox:
         self.Max = w
         self.clsr = classifier
         self.Center = (v+w)/2
-        self.wCenter =(v+w)/2;
+        self.wCenter =(v+w)/2
         self.theta = theta
-        self.samples=[];
+        self.samples=[]
         self.add_sample(v)
                 
     def expand(self,x):
@@ -28,8 +28,7 @@ class Hyperbox:
         
             
     def membership(self,x):
-       
-        m = np.sqrt(len(x))- np.linalg.norm(x-self.Center)
+         m = np.sqrt(len(x))- np.linalg.norm(x-self.Center)
 #        m = 1 - np.sqrt(np.sum((x-self.wCenter)**2))
         
 #        y = 0.5

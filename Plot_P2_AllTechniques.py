@@ -29,8 +29,7 @@ from deslib.util.datasets import *
 import scipy.io as sio
 import pickle
 
-
-###############################################################################
+#+##############################################################################
 # Defining helper functions to facilitate plotting the decision boundaries:
 
 def plot_classifier_decision(ax, clf, X, mode='line', **params):

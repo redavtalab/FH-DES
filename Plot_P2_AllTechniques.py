@@ -82,16 +82,17 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
     kne = KNORAE(pool_classifiers, k=k)
     desknn = DESKNN(pool_classifiers, k=k)
     ola = OLA(pool_classifiers, k=k)
-    lca = LCA(pool_classifiers, k=k)
+    #lca = LCA(pool_classifiers, k=k)
     mla = MLA(pool_classifiers, k=k)
     mcb = MCB(pool_classifiers, k=k)
     # rank = Rank(pool_classifiers, k=k)
     knop = KNOP(pool_classifiers, k=k)
     meta = METADES(pool_classifiers, k=k)
-    desfh = DESFH(pool_classifiers, k=k, theta=theta, gama=NO_Hyperbox_Thereshold)
+    desfh_w = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=False)
+    desfh = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
 
-    list_ds = [knorau, kne, ola, lca, mla, desknn, mcb, knop, meta, desfh]
-    names = ['KNORA-U', 'KNORA-E', 'OLA', 'LCA', 'MLA', 'DESKNN', 'MCB', 'KNOP', 'META-DES', 'DES-FH']
+    list_ds = [knorau, kne, ola, mla, desknn, mcb, knop, meta, desfh_w ,desfh]
+    names = ['KNORA-U', 'KNORA-E', 'OLA', 'MLA', 'DESKNN', 'MCB', 'KNOP', 'META-DES','DES-FH_W', 'DES-FH_M']
 
     #    list_ds = [knorau, kne, ola, lca, mla, desknn, mcb, rank, knop, meta]
     #    names = ['KNORA-U', 'KNORA-E', 'OLA', 'LCA', 'MLA', 'DESKNN', 'MCB',
@@ -107,7 +108,7 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.9
-classifiers_max_depth = 3
+
 NO_classifiers = 100
 no_itr = 20
 
@@ -119,7 +120,7 @@ rng = np.random.RandomState(ran)
 # X, y = make_circle_square([1000,1000], random_state=rng)
 # X, y = make_banana2(1000, random_state=rng)
 # X, y = make_xor(1000, random_state=rng)
-X, y = X, y = make_P2([1000, 1000], random_state=rng)
+X, y = make_P2([1000, 1000], random_state=rng)
 
 # X = preprocessing.MinMaxScaler().fit_transform(X)
 

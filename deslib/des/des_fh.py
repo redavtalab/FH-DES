@@ -24,9 +24,11 @@ class DESFH(BaseDES):
                  DSEL_perc=0.5,
                  HyperBoxes=[],
                  theta = 0.05,
-                 gama = 0.991):
+                 mu = 0.991,
+                 mis_samples_based = True):
         self.theta = theta
-        self.gama = gama
+        self.mu = mu
+        self.mis_sample_based = mis_samples_based
         DESFH.HBoxes = [];
 ############### it should be based on Clustering #############################
         super(DESFH, self).__init__(pool_classifiers=pool_classifiers,
@@ -58,14 +60,24 @@ class DESFH(BaseDES):
     def fit(self, X, y):
         
         super(DESFH, self).fit(X, y)
-        for classifier_index in range(self.n_classifiers_):
-            MissSet_indexes = ~self.DSEL_processed_[:,classifier_index]
-            self.setup_hyperboxs(MissSet_indexes, classifier_index)
+        if self.mu > 1 or self.mu <= 0
+            raise Exception ("The value of Mu must be between 0 and 1.")
+        if self.theta > 1 or self.theta <= 0
+            raise Exception ("The value of Mu must be between 0 and 1.")
+
+        if mis_samples_based:
+            for classifier_index in range(self.n_classifiers_):
+                MissSet_indexes = ~self.DSEL_processed_[:,classifier_index]
+                self.setup_hyperboxs(MissSet_indexes, classifier_index)
+        else:
+            for classifier_index in range(self.n_classifiers_):
+                WellSet_indexes = self.DSEL_processed_[:,classifier_index]
+                self.setup_hyperboxs(WellSet_indexes, classifier_index)
               
 
     def estimate_competence(self, query,neighbors=None, distances=None,
                             predictions=None):
-        
+
         competences_ = np.zeros([len(query),self.n_classifiers_])           
         for index , sample in enumerate(query):
             listboxComp = []
@@ -80,6 +92,7 @@ class DESFH(BaseDES):
                 clr = box.clsr
                 if clr!=currentClr:
                     listboxComp.sort()
+
                     if len(listboxComp)>1:
                         competences_[index,currentClr] = (0.7 * listboxComp[-1] + 0.3 * listboxComp[-2]) # + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
                     else:
@@ -88,14 +101,13 @@ class DESFH(BaseDES):
                     listboxComp = [] 
                 comp = box.membership(sample)
                 listboxComp.append(comp)
-            listboxComp.sort()    
+            listboxComp.sort()
             if len(listboxComp)>1:
                 competences_[index,clr] = (0.7 * listboxComp[-1] + 0.3 * listboxComp[-2]) # ( 10 * listboxComp[-1] + 9 * listboxComp[-2] + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
             else:
-                competences_[index,clr] = listboxComp[-1] # np.average(listboxComp)    
-#            comp = box.membership(sample)
-#            listboxComp.append(comp)
-        competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )     
+                competences_[index,clr] = listboxComp[-1] # np.average(listboxComp)
+
+        competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )
         
         
 #        competences_ = np.sum(self.DSEL_processed_[neighbors, :], axis=1,
@@ -197,12 +209,19 @@ class DESFH(BaseDES):
 
         # Checks which was the max value for each sample
         # (i.e., the maximum number of consecutive predictions)
-        max_value = np.max(competences, axis=1)
+
 
         # Select all base classifiers with the maximum number of
         #  consecutive correct predictions for each sample.
-        selected_classifiers = (
-                    competences >= self.gama * max_value.reshape(competences.shape[0], -1))
+        if mis_samples_based:
+            max_value = np.max(competences, axis=1)
+            selected_classifiers = (
+                    competences >= self.mu * max_value.reshape(competences.shape[0], -1))
+        else:
+            min_value = np.min(competences, axis=1)
+            selected_classifiers = (
+                    self.mu * competences <= min_value.reshape(competences.shape[0], -1))
+
 
         return selected_classifiers
     

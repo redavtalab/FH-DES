@@ -37,8 +37,8 @@ class Hyperbox:
 #        for n in range(ndimension):
 #            m = np.minimum(m,np.minimum(1- self.f(x[n] - self.Max[n] , y) , 1-self.f(self.Min[n] - x[n],y)))
 #        m = 1-m
-#        
-        return m
+#
+         return m
    
     def add_sample(self,x):
         self.samples.append(x)

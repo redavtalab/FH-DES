@@ -88,7 +88,7 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
     # rank = Rank(pool_classifiers, k=k)
     #knop = KNOP(pool_classifiers, k=k)
     meta = METADES(pool_classifiers, k=k)
-    desfh = DESFH(pool_classifiers, k=k, theta=theta, gama=NO_Hyperbox_Thereshold,mis_samples_based=True)
+    desfh = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold,mis_sample_based=True)
 
     #list_ds = [knorau, kne, ola, lca, mla, desknn, mcb, knop, meta, desfh]
     #names = ['KNORA-U', 'KNORA-E', 'OLA', 'LCA', 'MLA', 'DESKNN', 'MCB', 'KNOP', 'META-DES', 'DES-FH']
@@ -106,7 +106,7 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.9
-NO_classifiers = 2
+NO_classifiers = 5
 no_itr = 1
 
 #% %  ##
@@ -143,7 +143,7 @@ list_ds, names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
 
 #########################################################
 
-fig2, sub2 = plt.subplots(4, 3, figsize=(21, 28))
+fig2, sub2 = plt.subplots(3, 2, figsize=(30, 20))
 plt.subplots_adjust(wspace=0.3, hspace=0.3)
 
 ax_data = sub2.flatten()[0]

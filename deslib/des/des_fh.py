@@ -25,10 +25,10 @@ class DESFH(BaseDES):
                  HyperBoxes=[],
                  theta = 0.05,
                  mu = 0.991,
-                 mis_samples_based = True):
+                 mis_sample_based = True):
         self.theta = theta
         self.mu = mu
-        self.mis_sample_based = mis_samples_based
+        self.mis_sample_based = mis_sample_based
         DESFH.HBoxes = [];
 ############### it should be based on Clustering #############################
         super(DESFH, self).__init__(pool_classifiers=pool_classifiers,
@@ -60,12 +60,12 @@ class DESFH(BaseDES):
     def fit(self, X, y):
         
         super(DESFH, self).fit(X, y)
-        if self.mu > 1 or self.mu <= 0
+        if self.mu > 1 or self.mu <= 0:
             raise Exception ("The value of Mu must be between 0 and 1.")
-        if self.theta > 1 or self.theta <= 0
+        if self.theta > 1 or self.theta <= 0:
             raise Exception ("The value of Mu must be between 0 and 1.")
 
-        if mis_samples_based:
+        if self.mis_sample_based:
             for classifier_index in range(self.n_classifiers_):
                 MissSet_indexes = ~self.DSEL_processed_[:,classifier_index]
                 self.setup_hyperboxs(MissSet_indexes, classifier_index)
@@ -213,7 +213,7 @@ class DESFH(BaseDES):
 
         # Select all base classifiers with the maximum number of
         #  consecutive correct predictions for each sample.
-        if mis_samples_based:
+        if self.mis_sample_based:
             max_value = np.max(competences, axis=1)
             selected_classifiers = (
                     competences >= self.mu * max_value.reshape(competences.shape[0], -1))

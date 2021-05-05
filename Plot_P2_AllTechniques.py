@@ -14,6 +14,8 @@ import sklearn.preprocessing as preprocessing
 import scipy.io as sio
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import Perceptron
+
+import time
 from deslib.dcs import LCA
 from deslib.dcs import MLA
 from deslib.dcs import OLA
@@ -112,6 +114,7 @@ NO_Hyperbox_Thereshold = 0.9
 NO_classifiers = 100
 no_itr = 20
 
+start_time = time.time()
 # %% ###############################################################################
 # Generating the dataset and training the pool of classifiers.
 ran = np.random.randint(1, 10000, 1)
@@ -184,3 +187,5 @@ for ds, name in zip(list_ds, names):
 
 acc = str(pool_classifiers.score(X_test, y_test))
 print('Accuracy Bagging: ' + acc)
+
+print("time:", time.time()-start_time)

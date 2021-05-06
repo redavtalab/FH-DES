@@ -12,7 +12,8 @@ from deslib.util.fuzzy_hyperbox import Hyperbox
 
 class DESFH(BaseDES):
     
-
+    HBoxes = []
+    NO_hypeboxes = 0
     def __init__(self, pool_classifiers=None,
                  k=7, DFP=False, 
                  with_IH=False,
@@ -28,9 +29,7 @@ class DESFH(BaseDES):
         self.theta = theta
         self.mu = mu
         self.mis_sample_based = mis_sample_based
-        self.HBoxes = []
-        self.NO_hypeboxes = 0
-
+        DESFH.HBoxes = [];
 ############### it should be based on Clustering #############################
         super(DESFH, self).__init__(pool_classifiers=pool_classifiers,
                                             with_IH=with_IH,
@@ -83,13 +82,13 @@ class DESFH(BaseDES):
         for index , sample in enumerate(query):
             listboxComp = []
             
-            if len(self.HBoxes)<1:  # when there is no box, competence is 1 for all classifiers
+            if len(DESFH.HBoxes)<1:  # when there is no box, competence is 1 for all classifiers
                 competences_ +=1
                 break;
             
-            currentClr = self.HBoxes[0].clsr
+            currentClr = DESFH.HBoxes[0].clsr
             clr = 0
-            for box in self.HBoxes:
+            for box in DESFH.HBoxes:
                 clr = box.clsr
                 if clr!=currentClr:
                     listboxComp.sort()
@@ -108,9 +107,9 @@ class DESFH(BaseDES):
             else:
                 competences_[index,clr] = listboxComp[-1] # np.average(listboxComp)
 
-#        competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )
-        
-        
+        #competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )
+        competences_ = np.sqrt(len(sample)) - competences_
+
 #        competences_ = np.sum(self.DSEL_processed_[neighbors, :], axis=1,
 #                             dtype=np.float)
 #        competences_ = competences_ * 0;
@@ -136,7 +135,7 @@ class DESFH(BaseDES):
             if len(boxes) < 1:
                 #Create the first Box
                 b = Hyperbox(v=X, w=X, classifier=classifier,theta =self.theta)
-                self.NO_hypeboxes += 1
+                DESFH.NO_hypeboxes += 1
                 boxes.append(b)
                 continue
                 
@@ -166,10 +165,10 @@ class DESFH(BaseDES):
 #            else:
             b = Hyperbox(v=X, w=X, classifier=classifier, theta =self.theta )
             boxes.append(b)
-            self.NO_hypeboxes += 1
+            DESFH.NO_hypeboxes += 1
             
        
-        self.HBoxes.extend(boxes)
+        DESFH.HBoxes.extend(boxes)
             
             
     def select(self, competences):

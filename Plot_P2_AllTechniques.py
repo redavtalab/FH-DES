@@ -122,10 +122,10 @@ start_time = time.time()
 ran = np.random.randint(1, 10000, 1)
 print("RandomState: ", ran)
 rng = np.random.RandomState(ran)
-#X, y = make_circle_square([1000,1000], random_state=rng)
+X, y = make_circle_square([1000,1000], random_state=rng)
 # X, y = make_banana2(1000, random_state=rng)
 # X, y = make_xor(1000, random_state=rng)
-X, y = make_P2([1000, 1000], random_state=rng)
+#X, y = make_P2([1000, 1000], random_state=rng)
 
 ## Preparing Data
 

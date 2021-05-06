@@ -12,8 +12,7 @@ from deslib.util.fuzzy_hyperbox import Hyperbox
 
 class DESFH(BaseDES):
     
-    HBoxes = []
-    NO_hypeboxes = 0
+
     def __init__(self, pool_classifiers=None,
                  k=7, DFP=False, 
                  with_IH=False,
@@ -29,7 +28,9 @@ class DESFH(BaseDES):
         self.theta = theta
         self.mu = mu
         self.mis_sample_based = mis_sample_based
-        DESFH.HBoxes = [];
+        self.HBoxes = []
+        self.NO_hypeboxes = 0
+
 ############### it should be based on Clustering #############################
         super(DESFH, self).__init__(pool_classifiers=pool_classifiers,
                                             with_IH=with_IH,
@@ -65,7 +66,7 @@ class DESFH(BaseDES):
         if self.theta > 1 or self.theta <= 0:
             raise Exception ("The value of Mu must be between 0 and 1.")
 
-        if self.mis_sample_based:
+        if self.mis_sample_based==True:
             for classifier_index in range(self.n_classifiers_):
                 MissSet_indexes = ~self.DSEL_processed_[:,classifier_index]
                 self.setup_hyperboxs(MissSet_indexes, classifier_index)
@@ -82,13 +83,13 @@ class DESFH(BaseDES):
         for index , sample in enumerate(query):
             listboxComp = []
             
-            if len(DESFH.HBoxes)<1:  # when there is no box, competence is 1 for all classifiers
+            if len(self.HBoxes)<1:  # when there is no box, competence is 1 for all classifiers
                 competences_ +=1
                 break;
             
-            currentClr = DESFH.HBoxes[0].clsr
+            currentClr = self.HBoxes[0].clsr
             clr = 0
-            for box in DESFH.HBoxes:
+            for box in self.HBoxes:
                 clr = box.clsr
                 if clr!=currentClr:
                     listboxComp.sort()
@@ -107,7 +108,7 @@ class DESFH(BaseDES):
             else:
                 competences_[index,clr] = listboxComp[-1] # np.average(listboxComp)
 
-        competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )
+#        competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )
         
         
 #        competences_ = np.sum(self.DSEL_processed_[neighbors, :], axis=1,
@@ -124,28 +125,26 @@ class DESFH(BaseDES):
     
     
     
-    def setup_hyperboxs(self,Mis_ind,classifier):
-#        print(np.size(Mis_ind))
-        if np.size(Mis_ind)<1:
-            pass 
-#       MisSet = self.DSEL_data_(Mis_ind) 
+    def setup_hyperboxs(self,samples_ind,classifier):
+#        print(np.size(samples_ind))
+        if np.size(samples_ind)<1:
+            pass
         boxes = []
-        mis_samples = self.DSEL_data_[Mis_ind,:]
-        for X in mis_samples:
+        selected_samples = self.DSEL_data_[samples_ind,:]
+        for X in selected_samples:
             # Creation first box
             if len(boxes) < 1:
                 #Create the first Box
                 b = Hyperbox(v=X, w=X, classifier=classifier,theta =self.theta)
-                DESFH.NO_hypeboxes += 1
+                self.NO_hypeboxes += 1
                 boxes.append(b)
                 continue
                 
             # X is in a box?
             IsInBox = False
             for box in boxes:
-                if np.all(box.Min>X) and np.all(box.Max<X):
+                if np.all(box.Min<X) and np.all(box.Max>X):
                     IsInBox = True
-                    box.add_sample(X)
             if IsInBox:
                 #nop
                 continue
@@ -167,10 +166,10 @@ class DESFH(BaseDES):
 #            else:
             b = Hyperbox(v=X, w=X, classifier=classifier, theta =self.theta )
             boxes.append(b)
-            DESFH.NO_hypeboxes += 1
+            self.NO_hypeboxes += 1
             
        
-        DESFH.HBoxes.extend(boxes)
+        self.HBoxes.extend(boxes)
             
             
     def select(self, competences):

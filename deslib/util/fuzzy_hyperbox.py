@@ -9,16 +9,16 @@ class Hyperbox:
         self.Max = w
         self.clsr = classifier
         self.Center = (v+w)/2
-        self.wCenter =(v+w)/2
+        #self.wCenter =(v+w)/2
         self.theta = theta
-        self.samples=[]
-        self.add_sample(v)
+        #self.samples=[]
+        #self.add_sample(v)
                 
     def expand(self,x):
         self.Min = np.minimum(self.Min,x)
         self.Max = np.maximum(self.Max,x)
         self.Center = (self.Min + self.Max)/2
-        self.add_sample(x)
+        #self.add_sample(x)
         
     def is_expandable(self,x):
         candidV = np.minimum(self.Min, x)
@@ -28,9 +28,10 @@ class Hyperbox:
         
             
     def membership(self,x):
-         m = np.sqrt(len(x))- np.linalg.norm(x-self.Center)
-#        m = 1 - np.sqrt(np.sum((x-self.wCenter)**2))
-        
+         t = np.sqrt(len(x))
+         m = (t - np.linalg.norm(x-self.Center))/t
+#
+         #        m = 1 - np.sqrt(np.sum((x-self.wCenter)**2))
 #        y = 0.5
 #        m = np.inf
 #        ndimension = np.size(x)

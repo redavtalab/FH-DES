@@ -41,8 +41,8 @@ class Hyperbox:
 #
          return m
    
-    def add_sample(self,x):
-        self.samples.append(x)
+    #def add_sample(self,x):
+    #    self.samples.append(x)
 #        self.wCenter = ((len(self.samples)-1) * self.wCenter + x) / len(self.samples)
         
 #    def f(self, r,y):

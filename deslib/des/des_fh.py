@@ -12,8 +12,7 @@ from deslib.util.fuzzy_hyperbox import Hyperbox
 
 class DESFH(BaseDES):
     
-    HBoxes = []
-    NO_hypeboxes = 0
+
     def __init__(self, pool_classifiers=None,
                  k=7, DFP=False, 
                  with_IH=False,
@@ -29,7 +28,9 @@ class DESFH(BaseDES):
         self.theta = theta
         self.mu = mu
         self.mis_sample_based = mis_sample_based
-        DESFH.HBoxes = [];
+        self.HBoxes = []
+        self.NO_hypeboxes = 0
+
 ############### it should be based on Clustering #############################
         super(DESFH, self).__init__(pool_classifiers=pool_classifiers,
                                             with_IH=with_IH,
@@ -82,13 +83,13 @@ class DESFH(BaseDES):
         for index , sample in enumerate(query):
             listboxComp = []
             
-            if len(DESFH.HBoxes)<1:  # when there is no box, competence is 1 for all classifiers
+            if len(self.HBoxes)<1:  # when there is no box, competence is 1 for all classifiers
                 competences_ +=1
                 break;
             
-            currentClr = DESFH.HBoxes[0].clsr
+            currentClr = self.HBoxes[0].clsr
             clr = 0
-            for box in DESFH.HBoxes:
+            for box in self.HBoxes:
                 clr = box.clsr
                 if clr!=currentClr:
                     listboxComp.sort()
@@ -135,7 +136,7 @@ class DESFH(BaseDES):
             if len(boxes) < 1:
                 #Create the first Box
                 b = Hyperbox(v=X, w=X, classifier=classifier,theta =self.theta)
-                DESFH.NO_hypeboxes += 1
+                self.NO_hypeboxes += 1
                 boxes.append(b)
                 continue
                 
@@ -165,10 +166,10 @@ class DESFH(BaseDES):
 #            else:
             b = Hyperbox(v=X, w=X, classifier=classifier, theta =self.theta )
             boxes.append(b)
-            DESFH.NO_hypeboxes += 1
+            self.NO_hypeboxes += 1
             
        
-        DESFH.HBoxes.extend(boxes)
+        self.HBoxes.extend(boxes)
             
             
     def select(self, competences):

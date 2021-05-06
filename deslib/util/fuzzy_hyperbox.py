@@ -28,11 +28,15 @@ class Hyperbox:
         
             
     def membership(self,x):
-         t = np.sqrt(len(x))/3
+
          d = np.linalg.norm(x-self.Center)
-         m = (1-d/t)
-         if m<0:
-             m=0
+         po= d/np.sqrt(len(x)-1)  # adapting with high dimensional problems
+         m = np.power(0.05,po)
+
+#         t = np.sqrt(len(x))/3
+#         m = (1-d/t)
+#         if m<0:
+#             m=0
 #
          #        m = 1 - np.sqrt(np.sum((x-self.wCenter)**2))
 #        y = 0.5

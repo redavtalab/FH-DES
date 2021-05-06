@@ -5,15 +5,18 @@ Dynamic selection with linear classifiers: P2 Problem
 """
 
 import matplotlib.pyplot as plt
+from matplotlib import patches
 from matplotlib.patches import Rectangle
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
 import sklearn.preprocessing as preprocessing
 import scipy.io as sio
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import Perceptron
+from sklearn.preprocessing import StandardScaler
 
 import time
 from deslib.dcs import LCA
@@ -56,15 +59,15 @@ def plot_dataset(X, y, ax=None, title=None, **params):
         ax.set_title(title)
 
     # P2 Problem
-    x = np.arange(0, 1, 0.01)  # start,stop,step
-    y1 = (2 * np.sin(x * 10) + 5) / 10
-    ax.plot(x, y1, c='k', linewidth=3)
-    y2 = ((x * 10 - 2) ** 2 + 1) / 10
-    ax.plot(x, y2, c='k', linewidth=3)
-    y3 = (-0.1 * (x * 10) ** 2 + 0.6 * np.sin(4 * x * 10) + 8.) / 10.
-    ax.plot(x, y3, c='k', linewidth=3)
-    y4 = (((x * 10 - 10) ** 2) / 2 + 7.902) / 10.
-    ax.plot(x, y4, c='k', linewidth=3)
+    #x = np.arange(0, 1, 0.01)  # start,stop,step
+    #y1 = (2 * np.sin(x * 10) + 5) / 10
+    #ax.plot(x, y1, c='k', linewidth=3)
+    #y2 = ((x * 10 - 2) ** 2 + 1) / 10
+    #ax.plot(x, y2, c='k', linewidth=3)
+    #y3 = (-0.1 * (x * 10) ** 2 + 0.6 * np.sin(4 * x * 10) + 8.) / 10.
+    #ax.plot(x, y3, c='k', linewidth=3)
+    #y4 = (((x * 10 - 10) ** 2) / 2 + 7.902) / 10.
+    #ax.plot(x, y4, c='k', linewidth=3)
     # Circle
     # circle = patches.Circle((0.5, 0.5), 0.4, edgecolor = 'black', linestyle = 'dotted', linewidth = '2',facecolor='none')
     # ax.add_patch(circle)
@@ -90,10 +93,10 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
     # rank = Rank(pool_classifiers, k=k)
     knop = KNOP(pool_classifiers, k=k)
     meta = METADES(pool_classifiers, k=k)
-    desfh_w = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=False)
-    desfh = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
+    desfh_W = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=False)
+    desfh_M = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
 
-    list_ds = [knorau, kne, ola, mla, desknn, mcb, knop, meta, desfh_w ,desfh]
+    list_ds = [knorau, kne, ola, mla, desknn, mcb, knop, meta, desfh_W ,desfh_M]
     names = ['KNORA-U', 'KNORA-E', 'OLA', 'MLA', 'DESKNN', 'MCB', 'KNOP', 'META-DES','DES-FH_W', 'DES-FH_M']
 
     #    list_ds = [knorau, kne, ola, lca, mla, desknn, mcb, rank, knop, meta]
@@ -110,7 +113,6 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.9
-
 NO_classifiers = 100
 no_itr = 20
 
@@ -120,22 +122,35 @@ start_time = time.time()
 ran = np.random.randint(1, 10000, 1)
 print("RandomState: ", ran)
 rng = np.random.RandomState(ran)
-# X, y = make_circle_square([1000,1000], random_state=rng)
+#X, y = make_circle_square([1000,1000], random_state=rng)
 # X, y = make_banana2(1000, random_state=rng)
 # X, y = make_xor(1000, random_state=rng)
 X, y = make_P2([1000, 1000], random_state=rng)
 
+## Preparing Data
+
 # X = preprocessing.MinMaxScaler().fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, stratify=y, random_state=rng)
+X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5, stratify=y_test, random_state=rng)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=rng)
-X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5, random_state=rng)
+#### **** #### **** #### **** #### **** #### **** #### ****
+scaler = preprocessing.MinMaxScaler()
+X = scaler.fit_transform(X)
+X_train = scaler.transform(X_train)
+X_DSEL = scaler.transform(X_DSEL)
+X_test = scaler.transform(X_test)
+#### **** #### **** #### **** #### **** #### **** #### ****
 
-# model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5,5 ))
-model = CalibratedClassifierCV(Perceptron(max_iter=1000, tol=0.0002))
-# model = DecisionTreeClassifier(max_depth=classifiers_max_depth)
+model = CalibratedClassifierCV(Perceptron(max_iter=100, tol=10e-3,alpha=0.001,penalty=None),cv=5)
+pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, bootstrap=True, max_samples=1.0, random_state=rng)
+pool_classifiers.fit(X_train, y_train)
 
-pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, random_state=rng)
-pool_classifiers.fit(X_DSEL, y_DSEL)
+### ### Different Calibration Method ### ###
+#calibrated_pool = []
+#for clf in pool_classifiers:
+#    calibrated = CalibratedClassifierCV(base_estimator=clf, cv='prefit')
+#    calibrated.fit(X_DSEL, y_DSEL)
+#    calibrated_pool.append(calibrated)
 
 ###############################################################################
 
@@ -189,3 +204,5 @@ acc = str(pool_classifiers.score(X_test, y_test))
 print('Accuracy Bagging: ' + acc)
 
 print("time:", time.time()-start_time)
+
+#Accuracy_chart_table+.ipynb

@@ -164,7 +164,7 @@ def generalization_phase():
 
     baggingScore = 0
     oracleScores = np.zeros((no_itr, len(datasets)))
-    overall_results = np.zeros((NO_datasets, no_itr, len(datasets)))
+    overall_results = np.zeros((No_methods, no_itr, len(datasets)))
     for datasetName in datasets.values():
         state = 0
         starttime = time.time()

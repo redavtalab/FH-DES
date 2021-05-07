@@ -59,30 +59,30 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     desfh_m = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
     #oracle = Oracle(pool_classifiers)
     list_ds = [knorau, ola, desknn,meta, desfh_w,desfh_m]
-    names = ['KNORA-U', 'OLA', 'DES-KNN','META-DES', 'FH-DES_W', 'FH-DES_M']
+    methods_list = ['KNORA-U', 'OLA', 'DES-KNN','META-DES', 'FH-DES_W', 'FH-DES_M']
 
     # fit the ds techniques
     for ds in list_ds:
         ds.fit(X_DSEL, y_DSEL)
 
-    return list_ds, names
+    return list_ds, methods_list
 
-def plot_MinMaxAve(results, names):
+def plot_MinMaxAve(results, methods_list):
     ave_acc = np.average(results, 1)
     min_acc = np.min(results, 1)
     max_acc = np.max(results, 1)
     std_acc = np.std(results, 1)
 
     fig, ax = plt.subplots()
-    ax.plot(names, ave_acc, label="Average")
-    ax.plot(names, min_acc, label="Min")
-    ax.plot(names, max_acc, label="Max")
+    ax.plot(methods_list, ave_acc, label="Average")
+    ax.plot(methods_list, min_acc, label="Min")
+    ax.plot(methods_list, max_acc, label="Max")
 
-    plt.xticks(names)
-    for na, ac in zip(names, ave_acc):
+    plt.xticks(methods_list)
+    for na, ac in zip(methods_list, ave_acc):
         print("Accuracy {} = {}"
               .format(na, ac))
-    for na, std in zip(names, std_acc):
+    for na, std in zip(methods_list, std_acc):
         print("STD {} = {}"
               .format(na, std))
 
@@ -95,7 +95,7 @@ def plot_MinMaxAve(results, names):
     plt.show()
 
 def write_results_to_file(results,methods, datasetName):
-    path = datasetName + "Final Results.p"
+    path = "Results/" + datasetName + "Final Results.p"
     rfile = open(path, mode="wb")
     pickle.dump(methods,rfile)
     pickle.dump(results,rfile)
@@ -143,7 +143,7 @@ def train_phase():
 
             # print(datasetName," ", state, " is loaded.")
             pool_classifiers.fit(X_train, y_train)
-            list_ds, names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
+            list_ds, methods_list = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
 
             pickle.dump(state, poolspec)
             pickle.dump(pool_classifiers, poolspec)
@@ -154,7 +154,7 @@ def train_phase():
             pickle.dump(X_DSEL, poolspec)
             pickle.dump(y_DSEL, poolspec)
             pickle.dump(list_ds, poolspec)
-            pickle.dump(names, poolspec)
+            pickle.dump(methods_list, poolspec)
 
             del pool_classifiers
             state += 1
@@ -169,7 +169,7 @@ def generalization_phase():
         state = 0
         starttime = time.time()
         #    try:
-        results = np.zeros((NO_datasets, no_itr))
+        results = np.zeros((len(methods_list), no_itr))
         for itr in range(0, no_itr):
             filepath = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
             poolspec = open(filepath, "rb")
@@ -183,7 +183,7 @@ def generalization_phase():
                 X_DSEL = pickle.load(poolspec)
                 y_DSEL = pickle.load(poolspec)
                 list_ds = pickle.load(poolspec)
-                names = pickle.load(poolspec)
+                methods_list = pickle.load(poolspec)
 
                 for ind in range(0, NO_datasets):
                     results[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
@@ -199,13 +199,13 @@ def generalization_phase():
 
         print("\n\n Results for", datasetName, ":")
         print("Running time: " + str(time.time() - starttime))
-        #plot_MinMaxAve(results, names)
+        #plot_MinMaxAve(results, methods_list)
         overall_results[:, :, dataset_counter] = results
 
         print('Oracle result:', np.average(oracleScores[:, dataset_counter]))
         print('Bagging result:', baggingScore / no_itr)
         baggingScore = 0
-        write_results_to_file(results,names,datasetName)
+        write_results_to_file(results,methods_list,datasetName)
         dataset_counter += 1
 
 theta = .1

@@ -205,7 +205,7 @@ def generalization_phase():
         print('Oracle result:', np.average(oracleScores[:, dataset_counter]))
         print('Bagging result:', baggingScore / no_itr)
         baggingScore = 0
-        write_results_to_file(results,names)
+        write_results_to_file(results,names,datasetName)
         dataset_counter += 1
 
 theta = .1

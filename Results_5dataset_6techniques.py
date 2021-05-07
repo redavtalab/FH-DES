@@ -208,14 +208,14 @@ datasets = {
           #11: "balance-scale",
           #37:"diabetes",
           #268:"Ecoli",
-          #39:"Sonar",
+          39:"Sonar",
           #40:"Glass",
           #272:"Haberman",
           #47:"tae",
           52: "Heart",
-          #53: "Vehicle",
-          #146209: "Thyroid",
-          #2993: "Wine"
+          53: "Vehicle",
+          146209: "Thyroid",
+          2993: "Wine"
 }
 list_ds = []
 train_phase()

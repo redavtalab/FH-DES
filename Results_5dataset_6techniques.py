@@ -5,9 +5,9 @@ Dynamic selection with linear classifiers: P2 Problem
 """
 
 import pickle
-import pandas as pd
-import openml
-from openml.tasks import TaskType
+#import pandas as pd
+#import openml
+#from openml.tasks import TaskType
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 from matplotlib.ticker import FuncFormatter
@@ -37,9 +37,9 @@ from deslib.util.datasets import make_P2
 import sklearn.preprocessing as preprocessing
 import scipy.io as sio
 import time
-import xlsxwriter
+#import xlsxwriter
 import sys
-from datetime import datetime
+#from datetime import datetime
 
 #+##############################################################################
 
@@ -155,6 +155,7 @@ def generalization_phase():
     overall_results = np.zeros((NO_ds, no_itr, len(datasets)))
     for datasetName in datasets.values():
         state = 0
+        starttime = time.time()
         #    try:
         results = np.zeros((NO_ds, no_itr))
         for itr in range(0, no_itr):
@@ -186,7 +187,9 @@ def generalization_phase():
             oracleScores[itr, dataset_counter] = oracle.score(X_test, y_test) * 100
             baggingScore += pool_classifiers.score(X_test, y_test) * 100
 
+
         print("\n\n Results for", datasetName, ":")
+        print("Running time: " + str(time.time() - starttime))
         plot_MinMaxAve(results, names=names)
         overall_results[:, :, dataset_counter] = results
 

@@ -94,6 +94,13 @@ def plot_MinMaxAve(results, names):
     ax.legend(loc='lower right')
     plt.show()
 
+def write_results_to_file(results,methods, datasetName):
+    path = datasetName + "Final Results.p"
+    rfile = open(path, mode="wb")
+    pickle.dump(methods,rfile)
+    pickle.dump(results,rfile)
+    rfile.close()
+
 def train_phase():
     for taskID, datasetName in datasets.items():
 
@@ -133,8 +140,10 @@ def train_phase():
             model = CalibratedClassifierCV(Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None), cv=5)
             pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, bootstrap=True, max_samples=1.0,
                                                  random_state=rng)
-            pool_classifiers.fit(X_train, y_train)
 
+            # print(datasetName," ", state, " is loaded.")
+            pool_classifiers.fit(X_train, y_train)
+            list_ds, names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
 
             pickle.dump(state, poolspec)
             pickle.dump(pool_classifiers, poolspec)
@@ -144,6 +153,9 @@ def train_phase():
             pickle.dump(y_test, poolspec)
             pickle.dump(X_DSEL, poolspec)
             pickle.dump(y_DSEL, poolspec)
+            pickle.dump(list_ds, poolspec)
+            pickle.dump(names, poolspec)
+
             del pool_classifiers
             state += 1
 
@@ -152,12 +164,12 @@ def generalization_phase():
 
     baggingScore = 0
     oracleScores = np.zeros((no_itr, len(datasets)))
-    overall_results = np.zeros((NO_ds, no_itr, len(datasets)))
+    overall_results = np.zeros((NO_datasets, no_itr, len(datasets)))
     for datasetName in datasets.values():
         state = 0
         starttime = time.time()
         #    try:
-        results = np.zeros((NO_ds, no_itr))
+        results = np.zeros((NO_datasets, no_itr))
         for itr in range(0, no_itr):
             filepath = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
             poolspec = open(filepath, "rb")
@@ -170,13 +182,10 @@ def generalization_phase():
                 y_test = pickle.load(poolspec)
                 X_DSEL = pickle.load(poolspec)
                 y_DSEL = pickle.load(poolspec)
-                # print(datasetName," ", state, " is loaded.")
-                pool_classifiers.fit(X_train, y_train)
-                list_ds, names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
+                list_ds = pickle.load(poolspec)
+                names = pickle.load(poolspec)
 
-                # adding the 'Bagging' approach
-                # names.insert(0, 'Bagging')
-                for ind in range(0, NO_ds):
+                for ind in range(0, NO_datasets):
                     results[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
                 state += 1
             except:
@@ -190,20 +199,19 @@ def generalization_phase():
 
         print("\n\n Results for", datasetName, ":")
         print("Running time: " + str(time.time() - starttime))
-        plot_MinMaxAve(results, names=names)
+        #plot_MinMaxAve(results, names)
         overall_results[:, :, dataset_counter] = results
 
         print('Oracle result:', np.average(oracleScores[:, dataset_counter]))
         print('Bagging result:', baggingScore / no_itr)
         baggingScore = 0
-
+        write_results_to_file(results,names)
         dataset_counter += 1
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.9
 NO_classifiers = 100
 no_itr = 20
-NO_ds = 6
 
 datasets = {
           #59: "iris",
@@ -220,6 +228,7 @@ datasets = {
           146209: "Thyroid",
           2993: "Wine"
 }
+NO_datasets = len(datasets)
 list_ds = []
 train_phase()
 generalization_phase()

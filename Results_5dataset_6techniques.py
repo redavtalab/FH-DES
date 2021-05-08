@@ -95,7 +95,7 @@ def plot_MinMaxAve(results, methods_names):
     plt.show()
 
 def write_results_to_file(results,methods, datasetName):
-    path = "Results/" + datasetName + "Final Results.p"
+    path =  "Results/" + datasetName + "Final Results.p"
     rfile = open(path, mode="wb")
     pickle.dump(methods,rfile)
     pickle.dump(results,rfile)

@@ -185,7 +185,7 @@ def generalization_phase():
                 list_ds = pickle.load(poolspec)
                 methods_names = pickle.load(poolspec)
 
-                for ind in range(0, NO_datasets):
+                for ind in range(0, No_methods):
                     results[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
                 state += 1
             except:

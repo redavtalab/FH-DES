@@ -29,35 +29,36 @@ class Hyperbox:
             
     def membership(self,x):
 
-         d = np.linalg.norm(x-self.Center)
-         po= d/np.sqrt(len(x)-1)  # adapting with high dimensional problems
-         m = np.power(0.05,po)
+         #d = np.linalg.norm(x-self.Center)
+         #po= d/np.sqrt(len(x)-1)  # adapting with high dimensional problems
+         #m = np.power(0.05,po)
 
 #         t = np.sqrt(len(x))/3
 #         m = (1-d/t)
 #         if m<0:
 #             m=0
 #
-         #        m = 1 - np.sqrt(np.sum((x-self.wCenter)**2))
-#        y = 0.5
-#        m = np.inf
-#        ndimension = np.size(x)
-#        for n in range(ndimension):
-#            m = np.minimum(m,np.minimum(1- self.f(x[n] - self.Max[n] , y) , 1-self.f(self.Min[n] - x[n],y)))
-#        m = 1-m
+ #        m = 1 - np.sqrt(np.sum((x-self.wCenter)**2))
+
+        y = 2
+        m = np.inf
+        ndimension = np.size(x)
+        for n in range(ndimension):
+            m = np.minimum(m, np.minimum(1- self.f(x[n] - self.Max[n] , y) , 1-self.f(self.Min[n] - x[n],y)))
+#       m = 1-m
 #
-         return m
+        return m
    
     #def add_sample(self,x):
     #    self.samples.append(x)
 #        self.wCenter = ((len(self.samples)-1) * self.wCenter + x) / len(self.samples)
         
-#    def f(self, r,y):
-#        if r*y >1 :
-#            return 1
-#        if r*y >=0 :
-#            return r*y
-#        return 0
+    def f(self, r,y):
+        if r*y >1 :
+            return 1
+        if r*y >=0 :
+            return r*y
+        return 0
 #    
 
    

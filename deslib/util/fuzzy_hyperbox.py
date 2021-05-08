@@ -29,9 +29,9 @@ class Hyperbox:
             
     def membership(self,x):
 
-         d = np.linalg.norm(x-self.Center)
-         po= d/np.sqrt(len(x)-1)  # adapting with high dimensional problems
-         m = np.power(0.05,po)
+        d = np.linalg.norm(x-self.Center)
+        po= d/np.sqrt(len(x)-1)  # adapting with high dimensional problems
+        m = np.power(0.05,po)
 
 #         t = np.sqrt(len(x))/3
 #         m = (1-d/t)

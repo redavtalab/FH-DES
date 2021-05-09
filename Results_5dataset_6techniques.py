@@ -16,6 +16,7 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import Perceptron
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 

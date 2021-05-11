@@ -9,8 +9,8 @@ import pickle
 #import openml
 #from openml.tasks import TaskType
 #import matplotlib.pyplot as plt
-from matplotlib.cm import get_cmap
-from matplotlib.ticker import FuncFormatter
+#from matplotlib.cm import get_cmap
+#from matplotlib.ticker import FuncFormatter
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
 from sklearn.calibration import CalibratedClassifierCV

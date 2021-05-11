@@ -68,11 +68,11 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
 
     return list_ds, methods_names
 
-def plot_MinMaxAve(results, methods_names):
-    ave_acc = np.average(results, 1)
-    min_acc = np.min(results, 1)
-    max_acc = np.max(results, 1)
-    std_acc = np.std(results, 1)
+def plot_MinMaxAve(result, methods_names):
+    ave_acc = np.average(result, 1)
+    min_acc = np.min(result, 1)
+    max_acc = np.max(result, 1)
+    std_acc = np.std(result, 1)
 
     fig, ax = plt.subplots()
     ax.plot(methods_names, ave_acc, label="Average")
@@ -95,11 +95,11 @@ def plot_MinMaxAve(results, methods_names):
     ax.legend(loc='lower right')
     plt.show()
 
-def write_results_to_file(results,methods, datasetName):
+def write_results_to_file(result,methods, datasetName):
     path =  "Results/" + datasetName + "Final Results.p"
     rfile = open(path, mode="wb")
     pickle.dump(methods,rfile)
-    pickle.dump(results,rfile)
+    pickle.dump(result,rfile)
     rfile.close()
 
 def train_phase():
@@ -171,11 +171,11 @@ def generalization_phase():
         state = 0
         starttime = time.time()
         #    try:
-        results = np.zeros((No_methods, no_itr))
+        result = np.zeros((No_methods, no_itr))
         for itr in range(0, no_itr):
             filepath = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
-            poolspec = open(filepath, "rb")
             try:
+                poolspec = open(filepath, "rb")
                 state = pickle.load(poolspec)
                 pool_classifiers = pickle.load(poolspec)
                 X_train = pickle.load(poolspec)
@@ -188,7 +188,7 @@ def generalization_phase():
                 methods_names = pickle.load(poolspec)
 
                 for ind in range(0, No_methods):
-                    results[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
+                    result[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
                 state += 1
             except:
                 print(datasetName, "could not be loaded")
@@ -201,13 +201,13 @@ def generalization_phase():
 
         print("\n\n Results for", datasetName, ":")
         print("Running time: " + str(time.time() - starttime))
-        #plot_MinMaxAve(results, methods_names)
-        overall_results[:, :, dataset_counter] = results
+        #plot_MinMaxAve(result, methods_names)
+        overall_results[:, :, dataset_counter] = result
 
         print('Oracle result:', np.average(oracleScores[:, dataset_counter]))
         print('Bagging result:', baggingScore / no_itr)
         baggingScore = 0
-        write_results_to_file(results,methods_names,datasetName)
+        write_results_to_file(result,methods_names,datasetName)
         dataset_counter += 1
 
 theta = .1

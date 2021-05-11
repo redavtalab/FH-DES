@@ -176,8 +176,8 @@ def generalization_phase():
         results = np.zeros((No_methods, no_itr))
         for itr in range(0, no_itr):
             filepath = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
-            poolspec = open(filepath, "rb")
             try:
+                poolspec = open(filepath, "rb")
                 state = pickle.load(poolspec)
                 pool_classifiers = pickle.load(poolspec)
                 X_train = pickle.load(poolspec)

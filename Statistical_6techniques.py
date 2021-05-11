@@ -8,7 +8,7 @@ import pickle
 #import pandas as pd
 #import openml
 #from openml.tasks import TaskType
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 from matplotlib.ticker import FuncFormatter
 import numpy as np
@@ -67,33 +67,6 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
         ds.fit(X_DSEL, y_DSEL)
 
     return list_ds, methods_names
-
-def plot_MinMaxAve(result, methods_names):
-    ave_acc = np.average(result, 1)
-    min_acc = np.min(result, 1)
-    max_acc = np.max(result, 1)
-    std_acc = np.std(result, 1)
-
-    fig, ax = plt.subplots()
-    ax.plot(methods_names, ave_acc, label="Average")
-    ax.plot(methods_names, min_acc, label="Min")
-    ax.plot(methods_names, max_acc, label="Max")
-
-    plt.xticks(methods_names)
-    for na, ac in zip(methods_names, ave_acc):
-        print("Accuracy {} = {}"
-              .format(na, ac))
-    for na, std in zip(methods_names, std_acc):
-        print("STD {} = {}"
-              .format(na, std))
-
-    minlim = np.min(min_acc) - 1
-    maxlim = np.max(max_acc) + 1
-    ax.set_ylim(minlim, maxlim)
-    ax.set_xlabel('DS Method', fontsize=13)
-    ax.set_ylabel('Accuracy on the test set (%)', fontsize=13)
-    ax.legend(loc='lower right')
-    plt.show()
 
 def write_results_to_file(result,methods, datasetName):
     path =  "Results/" + datasetName + "Final Results.p"

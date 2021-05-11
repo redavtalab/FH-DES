@@ -114,52 +114,55 @@ def train_phase():
             X = data[:, 0:-1]
             y = data[:, -1]
             print(datasetName, "is readed.")
+            state = 0
+            print(datasetName, ': ', X.shape)
+
+            for itr in range(0, no_itr):
+                # print("Iteration: ",itr)
+                # rand = np.random.randint(1,10000,1)
+                rng = np.random.RandomState(state)
+                path = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
+                poolspec = open(path, mode="wb")
+
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, stratify=y,
+                                                                    random_state=rng)  # stratify=y
+                X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5, stratify=y_test,
+                                                                  random_state=rng)  # stratify=y_test
+                #### **** #### **** #### **** #### **** #### **** #### ****
+                scaler = preprocessing.MinMaxScaler()
+                X = scaler.fit_transform(X)
+                X_train = scaler.transform(X_train)
+                X_DSEL = scaler.transform(X_DSEL)
+                X_test = scaler.transform(X_test)
+                #### **** #### **** #### **** #### **** #### **** #### ****
+
+                model = CalibratedClassifierCV(Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None), cv=5)
+                # model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, ))
+                pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, bootstrap=True,
+                                                     max_samples=1.0,
+                                                     random_state=rng)
+
+                # print(datasetName," ", state, " is loaded.")
+                pool_classifiers.fit(X_train, y_train)
+                list_ds, methods_names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
+
+                pickle.dump(state, poolspec)
+                pickle.dump(pool_classifiers, poolspec)
+                pickle.dump(X_train, poolspec)
+                pickle.dump(y_train, poolspec)
+                pickle.dump(X_test, poolspec)
+                pickle.dump(y_test, poolspec)
+                pickle.dump(X_DSEL, poolspec)
+                pickle.dump(y_DSEL, poolspec)
+                pickle.dump(list_ds, poolspec)
+                pickle.dump(methods_names, poolspec)
+
+                del pool_classifiers
+                state += 1
         except:
             print(datasetName, "could not be readed")
             continue
-        state = 0
-        print(datasetName,': ', X.shape)
 
-        for itr in range(0, no_itr):
-            # print("Iteration: ",itr)
-            # rand = np.random.randint(1,10000,1)
-            rng = np.random.RandomState(state)
-            path = "SavedPools/" + datasetName + str(itr) +"-RState-" + np.str(state) + ".p"
-            poolspec = open(path, mode="wb")
-
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, stratify=y,random_state=rng)  # stratify=y
-            X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5,stratify=y_test,
-                                                              random_state=rng)  # stratify=y_test
-            #### **** #### **** #### **** #### **** #### **** #### ****
-            scaler = preprocessing.MinMaxScaler()
-            X = scaler.fit_transform(X)
-            X_train = scaler.transform(X_train)
-            X_DSEL = scaler.transform(X_DSEL)
-            X_test = scaler.transform(X_test)
-            #### **** #### **** #### **** #### **** #### **** #### ****
-
-            model = CalibratedClassifierCV(Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None), cv=5)
-            #model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, ))
-            pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, bootstrap=True, max_samples=1.0,
-                                                 random_state=rng)
-
-            # print(datasetName," ", state, " is loaded.")
-            pool_classifiers.fit(X_train, y_train)
-            list_ds, methods_names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
-
-            pickle.dump(state, poolspec)
-            pickle.dump(pool_classifiers, poolspec)
-            pickle.dump(X_train, poolspec)
-            pickle.dump(y_train, poolspec)
-            pickle.dump(X_test, poolspec)
-            pickle.dump(y_test, poolspec)
-            pickle.dump(X_DSEL, poolspec)
-            pickle.dump(y_DSEL, poolspec)
-            pickle.dump(list_ds, poolspec)
-            pickle.dump(methods_names, poolspec)
-
-            del pool_classifiers
-            state += 1
 
 def generalization_phase():
     dataset_counter = 0

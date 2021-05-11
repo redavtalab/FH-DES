@@ -163,7 +163,6 @@ def train_phase():
             print(datasetName, "could not be readed")
             continue
 
-
 def generalization_phase():
     dataset_counter = 0
 
@@ -219,20 +218,39 @@ NO_classifiers = 100
 no_itr = 20
 
 datasets = {
-          #59: "iris",
-          #10: "lymph",
-          #11: "balance-scale",
-          #37:"diabetes",
-          #268:"Ecoli",
-          39:"Sonar",
-          #40:"Glass",
-          #272:"Haberman",
-          #47:"tae",
-          52: "Heart",
-          53: "Vehicle",
-          146209: "Thyroid",
-          2993: "Wine"
+1: "Adult"  ,
+2:"Faults"   ,
+3:"Ionosphere" ,
+4:"Mammographic" ,
+5:"Thyroid",
+6:"Banana" ,
+7:"German"  ,
+8:"Laryngeal1" ,
+9:"Monk2" ,
+10:"Vehicle",
+11:"Blood"  ,
+12:"Glass"    ,
+13:"Laryngeal3" ,
+14:"Phoneme" ,
+15:"Vertebral",
+16:"Breast" ,
+17:"Haberman" ,
+18:"Lithuanian" ,
+19:"Pima" ,
+20:"WDVG1",
+21:"CTG" ,
+22:"Heart" ,
+23:"Liver" ,
+24:"Segmentation" ,
+25:"Weaning",
+26:"Ecoli"  ,
+27:"ILPD"  ,
+28:"Magic"  ,
+29:"Sonar" ,
+30:"Wine"
+
 }
+
 NO_datasets = len(datasets)
 list_ds = []
 No_methods = 6

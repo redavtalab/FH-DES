@@ -59,22 +59,22 @@ def plot_dataset(X, y, ax=None, title=None, **params):
         ax.set_title(title)
 
     # P2 Problem
-    #x = np.arange(0, 1, 0.01)  # start,stop,step
-    #y1 = (2 * np.sin(x * 10) + 5) / 10
-    #ax.plot(x, y1, c='k', linewidth=3)
-    #y2 = ((x * 10 - 2) ** 2 + 1) / 10
-    #ax.plot(x, y2, c='k', linewidth=3)
-    #y3 = (-0.1 * (x * 10) ** 2 + 0.6 * np.sin(4 * x * 10) + 8.) / 10.
-    #ax.plot(x, y3, c='k', linewidth=3)
-    #y4 = (((x * 10 - 10) ** 2) / 2 + 7.902) / 10.
-    #ax.plot(x, y4, c='k', linewidth=3)
+    x = np.arange(0, 1, 0.01)  # start,stop,step
+    y1 = (2 * np.sin(x * 10) + 5) / 10
+    ax.plot(x, y1, c='k', linewidth=1)
+    y2 = ((x * 10 - 2) ** 2 + 1) / 10
+    ax.plot(x, y2, c='k', linewidth=1)
+    y3 = (-0.1 * (x * 10) ** 2 + 0.6 * np.sin(4 * x * 10) + 8.) / 10.
+    ax.plot(x, y3, c='k', linewidth=1)
+    y4 = (((x * 10 - 10) ** 2) / 2 + 7.902) / 10.
+    ax.plot(x, y4, c='k', linewidth=1)
     # Circle
     # circle = patches.Circle((0.5, 0.5), 0.4, edgecolor = 'black', linestyle = 'dotted', linewidth = '2',facecolor='none')
     # ax.add_patch(circle)
 
     return ax
 
-def make_grid(x, y, h=.01):
+def make_grid(x, y, h=.03):
     x_min, x_max = x.min() - 0, x.max() + 0
     y_min, y_max = y.min() - 0, y.max() + 0
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
@@ -112,6 +112,7 @@ theta = .1
 NO_Hyperbox_Thereshold = 0.9
 NO_classifiers = 100
 no_itr = 1
+NO_samples = 1000
 
 start_time = time.time()
 # %% ###############################################################################
@@ -122,7 +123,7 @@ rng = np.random.RandomState(ran)
 #X, y = make_circle_square([1000,1000], random_state=rng)
 # X, y = make_banana2(1000, random_state=rng)
 # X, y = make_xor(1000, random_state=rng)
-X, y = make_P2([1000, 1000], random_state=rng)
+X, y = make_P2([round(NO_samples/2), round(NO_samples/2)], random_state=rng)
 
 ## Preparing Data
 
@@ -159,8 +160,8 @@ list_ds, names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
 
 #########################################################
 
-fig2, sub2 = plt.subplots(4, 3, figsize=(21, 28))
-plt.subplots_adjust(wspace=0.3, hspace=0.3)
+fig2, sub2 = plt.subplots(4, 2, figsize=(60, 30))
+plt.subplots_adjust(wspace=0.4, hspace=0.9)
 
 ax_data = sub2.flatten()[0]
 ax_bagging = sub2.flatten()[1]

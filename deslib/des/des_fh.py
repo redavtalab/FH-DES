@@ -95,7 +95,7 @@ class DESFH(BaseDES):
                     listboxComp.sort()
 
                     if len(listboxComp)>1:
-                        competences_[index,currentClr] = (0.7 * listboxComp[-1] + 0.3 * listboxComp[-2]) # + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
+                        competences_[index,currentClr] = listboxComp[-1] # (0.7 * listboxComp[-1] + 0.3 * listboxComp[-2]) # + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
                     else:
                         competences_[index,currentClr] = listboxComp[-1] # np.average(listboxComp)  
                     currentClr = clr
@@ -104,7 +104,7 @@ class DESFH(BaseDES):
                 listboxComp.append(comp)
             listboxComp.sort()
             if len(listboxComp)>1:
-                competences_[index,clr] = (0.7 * listboxComp[-1] + 0.3 * listboxComp[-2]) # ( 10 * listboxComp[-1] + 9 * listboxComp[-2] + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
+                competences_[index,clr] = listboxComp[-1] #(0.7 * listboxComp[-1] + 0.3 * listboxComp[-2]) # ( 10 * listboxComp[-1] + 9 * listboxComp[-2] + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
             else:
                 competences_[index,clr] = listboxComp[-1] # np.average(listboxComp)
 

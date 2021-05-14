@@ -191,36 +191,36 @@ NO_classifiers = 100
 no_itr = 20
 
 datasets = {
-#1: "Adult"  ,
+1: "Adult"  ,
 #2:"Faults"   ,
-#3:"Ionosphere" ,
+3:"Ionosphere" ,
 #4:"Mammographic" ,
-5:"Thyroid",
+#5:"Thyroid",
 #6:"Banana" ,
 #7:"German"  ,
-#8:"Laryngeal1" ,
-#9:"Monk2" ,
-10:"Vehicle",
-#11:"Blood"  ,
+8:"Laryngeal1" ,
+9:"Monk2" ,
+#10:"Vehicle",
+11:"Blood"  ,
 #12:"Glass"    ,
 #13:"Laryngeal3" ,
 #14:"Phoneme" ,
 #15:"Vertebral",
-#16:"Breast" ,
+16:"Breast" ,
 #17:"Haberman" ,
 #18:"Lithuanian" ,
 #19:"Pima" ,
 #20:"WDVG1",
 #21:"CTG" ,
-22:"Heart" ,
+#22:"Heart" ,
 #23:"Liver" ,
 #24:"Segmentation" ,
 #25:"Weaning",
 #26:"Ecoli"  ,
 #27:"ILPD"  ,
 #28:"Magic"  ,
-29:"Sonar" ,
-30:"Wine"
+#29:"Sonar" ,
+#30:"Wine"
 
 }
 

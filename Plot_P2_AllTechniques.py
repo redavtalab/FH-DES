@@ -84,24 +84,21 @@ def make_grid(x, y, h=.01):
 # Prepare the DS techniques. Changing k value to 7.
 def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
     knorau = KNORAU(pool_classifiers, k=k)
-    kne = KNORAE(pool_classifiers, k=k)
+    #kne = KNORAE(pool_classifiers, k=k)
     desknn = DESKNN(pool_classifiers, k=k)
     ola = OLA(pool_classifiers, k=k)
     #lca = LCA(pool_classifiers, k=k)
-    mla = MLA(pool_classifiers, k=k)
-    mcb = MCB(pool_classifiers, k=k)
+    #mla = MLA(pool_classifiers, k=k)
+    #mcb = MCB(pool_classifiers, k=k)
     # rank = Rank(pool_classifiers, k=k)
-    knop = KNOP(pool_classifiers, k=k)
+    #knop = KNOP(pool_classifiers, k=k)
     meta = METADES(pool_classifiers, k=k)
     desfh_W = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=False)
     desfh_M = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
 
-    list_ds = [knorau, kne, ola, mla, desknn, mcb, knop, meta , desfh_W, desfh_M]
-    names = ['KNORA-U', 'KNORA-E', 'OLA', 'MLA', 'DESKNN', 'MCB', 'KNOP', 'META-DES', 'DES-FH_W', 'DES-FH_M']
+    list_ds = [knorau, ola, desknn, meta , desfh_W, desfh_M]
+    names = ['KNORA-U', 'OLA', 'DESKNN', 'META-DES', 'DES-FH_W', 'DES-FH_M']
 
-    #    list_ds = [knorau, kne, ola, lca, mla, desknn, mcb, rank, knop, meta]
-    #    names = ['KNORA-U', 'KNORA-E', 'OLA', 'LCA', 'MLA', 'DESKNN', 'MCB',
-    #             'RANK', 'KNOP', 'META-DES']
     # fit the ds techniques
     for ds in list_ds:
         ds.fit(X, y)
@@ -114,7 +111,7 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
 theta = .1
 NO_Hyperbox_Thereshold = 0.9
 NO_classifiers = 100
-no_itr = 20
+no_itr = 1
 
 start_time = time.time()
 # %% ###############################################################################

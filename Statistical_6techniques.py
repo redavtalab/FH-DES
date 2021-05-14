@@ -141,7 +141,8 @@ def generalization_phase():
 
     baggingScore = 0
     oracleScores = np.zeros((no_itr, len(datasets)))
-    overall_results = np.zeros((No_methods, no_itr, len(datasets)))
+    overall_results = np.zeros((len(datasets),No_methods, no_itr))
+    methods_names = datasets.values()
     for datasetName in datasets.values():
         state = 0
         starttime = time.time()
@@ -177,21 +178,24 @@ def generalization_phase():
         print("\n\n Results for", datasetName, ":")
         print("Running time: " + str(time.time() - starttime))
         #plot_MinMaxAve(result, methods_names)
-        overall_results[:, :, dataset_counter] = result
+        overall_results[dataset_counter, :, :] = result
 
         print('Oracle result:', np.average(oracleScores[:, dataset_counter]))
         print('Bagging result:', baggingScore / no_itr)
         baggingScore = 0
-        write_results_to_file(result,methods_names,datasetName)
+        ## with out Oracle
+        #write_results_to_file(result,methods_names,datasetName)
+        #with Oracle
+        write_results_to_file(result,methods_names.append("Oracle"),datasetName)
         dataset_counter += 1
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.96
-NO_classifiers = 100
-no_itr = 20
+NO_classifiers = 2
+no_itr = 2
 
 datasets = {
-1: "Adult"  ,
+#1: "Adult"  ,
 #2:"Faults"   ,
 3:"Ionosphere" ,
 #4:"Mammographic" ,
@@ -227,5 +231,5 @@ datasets = {
 NO_datasets = len(datasets)
 list_ds = []
 No_methods = 6
-train_phase()
+#train_phase()
 generalization_phase()

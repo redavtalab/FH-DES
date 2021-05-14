@@ -191,8 +191,8 @@ def generalization_phase():
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.96
-NO_classifiers = 2
-no_itr = 2
+NO_classifiers = 100
+no_itr = 20
 
 datasets = {
 #1: "Adult"  ,

@@ -141,13 +141,13 @@ def generalization_phase():
 
     baggingScore = 0
     oracleScores = np.zeros((no_itr, len(datasets)))
-    overall_results = np.zeros((len(datasets),No_methods, no_itr))
+    #overall_results = np.zeros((len(datasets),No_methods, no_itr))
     methods_names = datasets.values()
     for datasetName in datasets.values():
         state = 0
         starttime = time.time()
         #    try:
-        result = np.zeros((No_methods, no_itr))
+        result = np.zeros((No_methods+1, no_itr))
         for itr in range(0, no_itr):
             filepath = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
             try:
@@ -171,42 +171,44 @@ def generalization_phase():
                 state += 1
                 continue
             oracle = Oracle(pool_classifiers).fit(X_train, y_train)
-            oracleScores[itr, dataset_counter] = oracle.score(X_test, y_test) * 100
+            orasco = oracle.score(X_test, y_test) * 100
+            oracleScores[itr, dataset_counter] = orasco
+            result[No_methods,itr] = orasco
             baggingScore += pool_classifiers.score(X_test, y_test) * 100
 
 
         print("\n\n Results for", datasetName, ":")
         print("Running time: " + str(time.time() - starttime))
-        #plot_MinMaxAve(result, methods_names)
-        overall_results[dataset_counter, :, :] = result
+
 
         print('Oracle result:', np.average(oracleScores[:, dataset_counter]))
         print('Bagging result:', baggingScore / no_itr)
         baggingScore = 0
-        ## with out Oracle
+        ## without Oracle
         #write_results_to_file(result,methods_names,datasetName)
         #with Oracle
-        write_results_to_file(result,methods_names.append("Oracle"),datasetName)
+        methods_names.append("Oracle")
+        write_results_to_file(result,methods_names,datasetName)
         dataset_counter += 1
 
 theta = .1
 NO_Hyperbox_Thereshold = 0.96
-NO_classifiers = 100
-no_itr = 20
+NO_classifiers = 3
+no_itr = 2
 
 datasets = {
 #1: "Adult"  ,
 #2:"Faults"   ,
-3:"Ionosphere" ,
+#3:"Ionosphere" ,
 #4:"Mammographic" ,
 #5:"Thyroid",
 #6:"Banana" ,
 #7:"German"  ,
-8:"Laryngeal1" ,
-9:"Monk2" ,
+#8:"Laryngeal1" ,
+#9:"Monk2" ,
 #10:"Vehicle",
-11:"Blood"  ,
-#12:"Glass"    ,
+#11:"Blood"  ,
+12:"Glass"    ,
 #13:"Laryngeal3" ,
 #14:"Phoneme" ,
 #15:"Vertebral",
@@ -224,12 +226,11 @@ datasets = {
 #27:"ILPD"  ,
 #28:"Magic"  ,
 #29:"Sonar" ,
-#30:"Wine"
-
+30:"Wine"
 }
 
 NO_datasets = len(datasets)
 list_ds = []
 No_methods = 6
-#train_phase()
+train_phase()
 generalization_phase()

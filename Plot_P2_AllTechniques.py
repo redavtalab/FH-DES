@@ -109,8 +109,8 @@ def initialize_ds(pool_classifiers, X, y, k=7):  # X_DSEL , y_DSEL
 # %% Parameters
 
 theta = .1
-NO_Hyperbox_Thereshold = 0.9
-NO_classifiers = 100
+NO_Hyperbox_Thereshold = 0.95
+NO_classifiers = 10
 no_itr = 1
 NO_samples = 1000
 

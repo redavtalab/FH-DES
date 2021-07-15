@@ -33,7 +33,7 @@ class Hyperbox:
         halfsize = (self.Max - self.Min) / 2
         d = disvec - halfsize;
         m = np.linalg.norm(d[d>0])
-        m = m / np.sqrt(len(x)-1)  # adapting with high dimensional problems
+        m = m / np.sqrt(len(x))  # adapting with high dimensional problems
         m= 1-m
         m = np.power(m,4)
         return m

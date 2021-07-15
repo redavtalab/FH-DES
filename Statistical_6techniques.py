@@ -193,7 +193,7 @@ def generalization_phase():
         dataset_counter += 1
 
 theta = .1
-NO_Hyperbox_Thereshold = 0.95
+NO_Hyperbox_Thereshold = 0.99
 NO_classifiers = 100
 no_itr = 20
 
@@ -230,10 +230,11 @@ datasets = {
 30:"Wine"
 }
 
+
 NO_datasets = len(datasets)
 list_ds = []
 No_methods = 6
-train_phase()
+#train_phase()
 generalization_phase()
 
 duration = 4  # seconds

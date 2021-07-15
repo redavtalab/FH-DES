@@ -39,7 +39,7 @@ import sklearn.preprocessing as preprocessing
 import scipy.io as sio
 import time
 #import xlsxwriter
-import sys
+import os
 #from datetime import datetime
 import warnings
 warnings.filterwarnings("ignore")
@@ -193,17 +193,17 @@ def generalization_phase():
         dataset_counter += 1
 
 theta = .1
-NO_Hyperbox_Thereshold = 0.90
+NO_Hyperbox_Thereshold = 0.95
 NO_classifiers = 100
 no_itr = 20
 
 datasets = {
 1: "Adult"  ,
-2:"Faults"   ,
+#2:"Faults"   ,
 3:"Ionosphere" ,
-4:"Mammographic" ,
+#4:"Mammographic" ,
 5:"Thyroid",
-6:"Banana" ,
+#6:"Banana" ,
 7:"German"  ,
 8:"Laryngeal1" ,
 9:"Monk2" ,
@@ -211,21 +211,21 @@ datasets = {
 11:"Blood"  ,
 12:"Glass"    ,
 13:"Laryngeal3" ,
-14:"Phoneme" ,
+#14:"Phoneme" ,
 15:"Vertebral",
 16:"Breast" ,
 17:"Haberman" ,
 18:"Lithuanian" ,
 19:"Pima" ,
-20:"WDVG1",
-21:"CTG" ,
+#20:"WDVG1",
+#21:"CTG" ,
 22:"Heart" ,
 23:"Liver" ,
-24:"Segmentation" ,
+#24:"Segmentation" ,
 25:"Weaning",
-26:"Ecoli"  ,
+#26:"Ecoli"  ,
 27:"ILPD"  ,
-28:"Magic"  ,
+#28:"Magic"  ,
 29:"Sonar" ,
 30:"Wine"
 }
@@ -235,3 +235,7 @@ list_ds = []
 No_methods = 6
 train_phase()
 generalization_phase()
+
+duration = 4  # seconds
+freq = 440  # Hz
+os.system('play -nq -t alsa synth {} sine {}'.format(duration, freq))

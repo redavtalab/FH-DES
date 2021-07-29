@@ -198,6 +198,17 @@ NO_classifiers = 100
 no_itr = 20
 
 datasets = {
+662 : "BreastCancer",
+663  : "Car",
+664  : "CreditScreening",
+665  : "Glass",
+666  : "Iris",
+667  : "Mammographic",
+668  : "Seeds",
+669  : "Statlog",
+661  : "Transfusion"
+}
+'''
 1: "Adult"  ,
 #2:"Faults"   ,
 3:"Ionosphere" ,
@@ -229,7 +240,7 @@ datasets = {
 29:"Sonar" ,
 30:"Wine"
 }
-
+'''
 
 NO_datasets = len(datasets)
 list_ds = []

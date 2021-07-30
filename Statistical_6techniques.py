@@ -199,7 +199,6 @@ no_itr = 20
 
 datasets = {
 662 : "BreastCancer",
-663  : "Car",
 664  : "CreditScreening",
 665  : "Glass",
 666  : "Iris",

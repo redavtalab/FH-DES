@@ -93,13 +93,9 @@ def train_phase():
             ### ### ### ### ### ### ### ### ###
             le = preprocessing.LabelEncoder()
             y = le.fit_transform(y)
-
             #### **** #### **** #### **** #### **** #### **** #### ****
             scaler = preprocessing.MinMaxScaler()
             X = scaler.fit_transform(X)
-            #X_train = scaler.transform(X_train)
-            #X_DSEL = scaler.transform(X_DSEL)
-            #X_test = scaler.transform(X_test)
             #### **** #### **** #### **** #### **** #### **** #### ****
 
             for itr in range(0, no_itr):

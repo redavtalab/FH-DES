@@ -90,6 +90,17 @@ def train_phase():
             print(datasetName, "is readed.")
             state = 0
             print(datasetName, ': ', X.shape)
+            ### ### ### ### ### ### ### ### ###
+            le = preprocessing.LabelEncoder()
+            y = le.fit_transform(y)
+
+            #### **** #### **** #### **** #### **** #### **** #### ****
+            scaler = preprocessing.MinMaxScaler()
+            X = scaler.fit_transform(X)
+            #X_train = scaler.transform(X_train)
+            #X_DSEL = scaler.transform(X_DSEL)
+            #X_test = scaler.transform(X_test)
+            #### **** #### **** #### **** #### **** #### **** #### ****
 
             for itr in range(0, no_itr):
                 # print("Iteration: ",itr)
@@ -102,14 +113,6 @@ def train_phase():
                                                                     random_state=rng)  # stratify=y
                 X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5, stratify=y_test,
                                                                   random_state=rng)  # stratify=y_test
-                #### **** #### **** #### **** #### **** #### **** #### ****
-                scaler = preprocessing.MinMaxScaler()
-                X = scaler.fit_transform(X)
-                X_train = scaler.transform(X_train)
-                X_DSEL = scaler.transform(X_DSEL)
-                X_test = scaler.transform(X_test)
-                #### **** #### **** #### **** #### **** #### **** #### ****
-
                 model = CalibratedClassifierCV(Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None), cv=5)
                 # model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, ))
                 pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, bootstrap=True,
@@ -192,21 +195,33 @@ def generalization_phase():
         write_results_to_file(result,methods_names,datasetName)
         dataset_counter += 1
 
-theta = .1
-NO_Hyperbox_Thereshold = 0.98
+theta = .25
+NO_Hyperbox_Thereshold = 0.99
 NO_classifiers = 100
 no_itr = 20
 
 datasets = {
-662 : "BreastCancer",
-664  : "CreditScreening",
-665  : "Glass",
-666  : "Iris",
-667  : "Mammographic",
-668  : "Seeds",
-669  : "Statlog",
-661  : "Transfusion"
+1: "Adult"  ,
+2: "Thyroid",
+3: "German"  ,
+4: "Vehicle",
+5: "Laryngeal1" ,
+6: "Laryngeal3" ,
+7: "Vertebral",
+8: "Breast" ,
+9: "Lithuanian" ,
+10: "Pima" ,
+11: "Heart" ,
+12: "Ionosphere" ,
+13: "ILPD"  ,
+14: "Sonar" ,
+15: "Iris",
+16: "Monk2",
+17: "Mammographic",
+18: "Statlog",
+19: "CreaditScreening"
 }
+
 '''
 1: "Adult"  ,
 #2:"Faults"   ,

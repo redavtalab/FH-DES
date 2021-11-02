@@ -73,52 +73,56 @@ class DESFH(BaseDES):
                 WellSet_indexes = self.DSEL_processed_[:, classifier_index]
                 self.setup_hyperboxs(WellSet_indexes, classifier_index)
 
-    def estimate_competence(self, query, neighbors=None, distances=None,
-                            predictions=None):
+    def estimate_competence(self, query, neighbors=None, distances=None, predictions=None):
+        boxes_classifier = np.zeros((len(self.HBoxes),1))
+        boxes_W = np.zeros((len(self.HBoxes),self.n_features_))
+        boxes_V = np.zeros((len(self.HBoxes),self.n_features_))
+        boxes_center = np.zeros((len(self.HBoxes),self.n_features_))
+        if self.mis_sample_based:
+            competences_ = np.ones([len(query), self.n_classifiers_])
+        else:
+            competences_ = np.zeros([len(query), self.n_classifiers_])
+        for i in range(len(self.HBoxes)):
+            boxes_classifier[i] = self.HBoxes[i].clsr
+            boxes_W[i] = self.HBoxes[i].Max
+            boxes_V[i] = self.HBoxes[i].Min
+            boxes_center[i] = (self.HBoxes[i].Max + self.HBoxes[i].Min) / 2
+        boxes_W = boxes_W.reshape(self.NO_hypeboxes, 1, self.n_features_)
+        boxes_V = boxes_V.reshape(self.NO_hypeboxes, 1, self.n_features_)
+        boxes_center = boxes_center.reshape(self.NO_hypeboxes,1,self.n_features_)
+        Xq = query.reshape(1,len(query),self.n_features_)
 
-        competences_ = np.zeros([len(query), self.n_classifiers_])
-        for index, sample in enumerate(query):
-            listboxComp = []
+        ## Membership Calculation
+        halfsize = ((boxes_W - boxes_V) / 2).reshape(self.NO_hypeboxes,1,self.n_features_)
+        d= np.abs(boxes_center - Xq) - halfsize
+        d[d<0] = 0
+        dd = np.linalg.norm(d,axis=2)
+        dd = dd / np.sqrt(self.n_features_)
+        m = 1 - dd  # m: membership
+        m = np.power(m,4)
 
-            if len(self.HBoxes) < 1:  # when there is no box, competence is 1 for all classifiers
-                competences_ += 1
-                break;
+        classifiers, indices, count = np.unique(boxes_classifier, return_counts = True,return_index = True)
+        k = 0
+        for clsr in classifiers:
+            c_range = range( indices[k], indices[k] + count[k])
+            k+=1
+            cmat = m[c_range]
+            if len(c_range) > 1:
+                #bb_indexes = np.argpartition(-cmat, kth=2, axis=0)[:2]
+                bb_indexes = np.argsort(-cmat, axis=0)
+                b1 = bb_indexes[0,:]
+                b2 = bb_indexes[1,:]
+                for i in range(0,len(query)):
+                    competences_[i,int(clsr)] = cmat[b1[i],i]*0.7 + cmat[b2[i],i]*0.3
+                # IndexError: index 2 is out of bounds for axis 0 with size 1
+            else:  # In case that we have only one hyperbox for the class
+                for i in range(0, len(query)):
+                    competences_[i, int(clsr)] = cmat[0, i]
 
-            currentClr = self.HBoxes[0].clsr
-            clr = 0
-            for box in self.HBoxes:
-                clr = box.clsr
-                if clr != currentClr:
-                    listboxComp.sort()
-
-                    if len(listboxComp) > 1:
-                        competences_[index, currentClr] = (0.7 * listboxComp[-1] + 0.3 * listboxComp[
-                            -2])  # + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
-                    else:
-                        competences_[index, currentClr] = listboxComp[-1]  # np.average(listboxComp)
-                    currentClr = clr
-                    listboxComp = []
-                comp = box.membership(sample)
-                listboxComp.append(comp)
-            listboxComp.sort()
-            if len(listboxComp) > 1:
-                competences_[index, clr] = (0.7 * listboxComp[-1] + 0.3 * listboxComp[
-                    -2])  # ( 10 * listboxComp[-1] + 9 * listboxComp[-2] + 8 * listboxComp[-3] + 7 * listboxComp[-4])/34
-            else:
-                competences_[index, clr] = listboxComp[-1]  # np.average(listboxComp)
-
-        # competences_=( np.sqrt(len(sample)) - (competences_ * len(box.samples)) )
-        competences_ = np.sqrt(len(sample)) - competences_
-
-        #        competences_ = np.sum(self.DSEL_processed_[neighbors, :], axis=1,
-        #                             dtype=np.float)
-        #        competences_ = competences_ * 0;
-        #        competences_[:,0] = 7
-        #        competences_[:,1] = 1
-        #        competences_[:,2] = 0.2
-        #        competences_[:,3] = 0.3
-        #        competences_[:,4] = 4
-
+        #################################################################### mistake ####################################33
+        if self.mis_sample_based:
+            competences_ = np.sqrt(self.n_features_) - competences_
+        #################################################################### mistake ####################################33
         return competences_
 
     def setup_hyperboxs(self, samples_ind, classifier):

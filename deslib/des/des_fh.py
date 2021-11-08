@@ -205,14 +205,20 @@ class DESFH(BaseDES):
 
         # Select all base classifiers with the maximum number of
         #  consecutive correct predictions for each sample.
-        if self.mis_sample_based:
-            max_value = np.max(competences, axis=1)
-            selected_classifiers = (
-                    competences >= self.mu * max_value.reshape(competences.shape[0], -1))
-        else:
-            min_value = np.min(competences, axis=1)
-            selected_classifiers = (
-                    self.mu * competences <= min_value.reshape(competences.shape[0], -1))
+
+        max_value = np.max(competences, axis=1)
+        selected_classifiers = (
+                competences >= self.mu * max_value.reshape(competences.shape[0], -1))
+        ################################ was a mistake ########################################
+        #if mis_sample?_based:
+        #    max_value = np.max(competences, axis=1)
+        #    selected_classifiers = (
+        #        competences >= self.mu * max_value.reshape(competences.shape[0], -1))
+        #else:
+        #    min_value = np.min(competences, axis=1)
+        #    selected_classifiers = (
+        #            self.mu * competences <= min_value.reshape(competences.shape[0], -1))
+        ########################################################################################
 
         return selected_classifiers
 

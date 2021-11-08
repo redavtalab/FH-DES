@@ -44,7 +44,7 @@ import os
 #from datetime import datetime
 import warnings
 
-from myfunctions import save_elements, load_elements, write_in_latex_table
+from myfunctions import *
 
 warnings.filterwarnings("ignore")
 
@@ -55,11 +55,11 @@ warnings.filterwarnings("ignore")
 # Prepare the DS techniques. Changing k value to 7.
 def initialize_ds(pool_classifiers, uncalibratedpool, X_DSEL, y_DSEL, k=7):
     knorau = KNORAU(pool_classifiers, k=k)
-    #kne = KNORAE(pool_classifiers, k=k)
+    kne = KNORAE(pool_classifiers, k=k)
     desknn = DESKNN(pool_classifiers, k=k)
     ola = OLA(pool_classifiers, k=k)
-    #lca = LCA(pool_classifiers, k=k)
-    #mla = MLA(pool_classifiers, k=k)
+    lca = LCA(pool_classifiers, k=k)
+    mla = MLA(pool_classifiers, k=k)
     mcb = MCB(pool_classifiers, k=k)
     rank = Rank(pool_classifiers, k=k)
     knop = KNOP(pool_classifiers, k=k)
@@ -67,14 +67,30 @@ def initialize_ds(pool_classifiers, uncalibratedpool, X_DSEL, y_DSEL, k=7):
     desfh_w = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=False)
     desfh_m = DESFH(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
     oracle = Oracle(pool_classifiers)
-    UC_oracle = Oracle(uncalibratedpool)
     single_best = SingleBest(pool_classifiers,n_jobs=-1)
     majority_voting = pool_classifiers
-    list_ds = [majority_voting,single_best, oracle,UC_oracle ,knorau, ola, desknn,rank, knop, meta, mcb,desfh_m]
-    methods_names = ['Majority-Voting', 'Single-Best', 'Oracle', 'Uncalibrated_Oracle', 'KNORA-U','OLA', 'DES-KNN', 'RANK', 'KNOP' ,'META-DES', 'MCB','FH-DES_M']
+
+    UC_knorau = KNORAU(uncalibratedpool, k=k)
+    UC_kne = KNORAE(uncalibratedpool, k=k)
+    UC_desknn = DESKNN(uncalibratedpool, k=k)
+    UC_ola = OLA(uncalibratedpool, k=k)
+    UC_lca = LCA(uncalibratedpool, k=k)
+    UC_mla = MLA(uncalibratedpool, k=k)
+    UC_mcb = MCB(uncalibratedpool, k=k)
+    UC_rank = Rank(uncalibratedpool, k=k)
+    UC_knop = KNOP(uncalibratedpool, k=k)
+    UC_meta = METADES(uncalibratedpool, k=k)
+    UC_desfh_w = DESFH(uncalibratedpool, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=False)
+    UC_desfh_m = DESFH(uncalibratedpool, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True)
+    UC_oracle = Oracle(uncalibratedpool)
+    UC_single_best = SingleBest(uncalibratedpool, n_jobs=-1)
+    UC_majority_voting = uncalibratedpool
+    list_ds = [majority_voting, single_best, oracle,knorau,kne,desknn,ola,mcb,rank,knop,meta,desfh_w,desfh_m, UC_majority_voting,  UC_single_best, UC_oracle, UC_knorau,UC_kne,UC_desknn,UC_ola,UC_mcb,UC_rank,UC_desfh_w,UC_desfh_m]
+    methods_names = ['MV', 'SB', 'Oracle', 'KNORA-U', 'KNORA-E', 'DESKNN', 'OLA', 'MCB', 'RANK', 'KNOP', 'META-DES', 'FH-DES-C', 'FH-DES-M', 'UC_MV', 'UC_SB', 'UC-Oracle', 'UC_KNORA-U', 'UC_KNORA-E', 'UC_DESKNN', 'UC_OLA', 'UC_MCB', 'UC_RANK',  'UC_FH-DES-C', 'UC_FH-DES-M' ]
     # fit the ds techniques
-    for ds in list_ds[1:]:
-        ds.fit(X_DSEL, y_DSEL)
+    for ds in list_ds:
+        if ds != majority_voting and ds != UC_majority_voting:
+            ds.fit(X_DSEL, y_DSEL)
 
     return list_ds, methods_names
 
@@ -147,12 +163,13 @@ theta = .25
 NO_Hyperbox_Thereshold = 0.99
 NO_classifiers =100
 no_itr = 20
-save_all_results = False
+save_all_results = True
 do_train = True
-NO_techniques = 12
+NO_techniques = 24
 datasets = {
-#30 Dataset "Ionosphere", "Adult", "Glass", "Sonar",    "Seeds",  "Magic", "CTG", "Faults", "Segmentation", "WDVG1", "Ecoli", "Phoneme","Liver",
- "German", "Laryngeal1",  "Vertebral", "Banana",
+#30 Dataset "Ionosphere", "Adult", "Glass",  "Ecoli",    "Seeds",
+#"Magic", "CTG", "Faults", "Segmentation", "WDVG1",  "Phoneme","Liver",
+ "German", "Laryngeal1",  "Vertebral", "Banana", "Sonar",
 "Laryngeal3",  "Pima", "Blood",  "Haberman",  "Lithuanian",    "Weaning",  "Breast",
 "Heart",     "Wine",    "ILPD",
 "Mammographic",  "Thyroid",  "Monk2",  "Vehicle"
@@ -168,21 +185,35 @@ whole_results = np.zeros([NO_datasets,NO_techniques,no_itr])
 dataset_count = 0
 done_list = []
 for datasetName in datasets:
+    try:
+        result,methods_names,list_ds = run_process(datasetName)
+        whole_results[dataset_count,:,:] = result
+        dataset_count +=1
+        done_list.append(datasetName)
 
-    result,methods_names,list_ds = run_process(datasetName)
-    whole_results[dataset_count,:,:] = result
-    dataset_count +=1
-    done_list.append(datasetName)
+    except:
+        print(datasetName, "could not be readed")
+        whole_results2 = whole_results[0:len(done_list),:,:]
+        write_whole_results_into_excel(whole_results2, done_list, methods_names)
 
-    # except:
-    #     print(datasetName, "could not be readed")
-pdata = np.concatenate((whole_results[:,0:4 ,:],whole_results[:,11 :12,:]) , axis=1)
-metName = methods_names[0:4]
-metName.append(methods_names[11])
+path = "Results/With and without Callibration.p"
+rfile = open(path, mode="wb")
+pickle.dump(whole_results,rfile)
+datasets = done_list
+pickle.dump(datasets,rfile)
+pickle.dump(methods_names,rfile)
+rfile.close()
+
+
+pdata = np.concatenate((whole_results[:,0:3 ,:],whole_results[:,10 :14,:],whole_results[:,21:22,:]) , axis=1)
+metName = methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]
 write_in_latex_table(pdata,done_list,metName,rows="datasets")
 write_in_latex_table(whole_results,done_list,methods_names,rows="datasets")
+
 
 duration = 4  # seconds
 freq = 440  # Hz
 os.system('play -nq -t alsa synth {} sine {}'.format(duration, freq))
 print("STD:" , np.average(np.std(whole_results,2),0))
+
+methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]

@@ -1,16 +1,10 @@
 """
 ====================================================================
-Dynamic selection with linear classifiers: P2 Problem
+Dynamic selection with linear classifiers: Statistical Experiment
 ====================================================================
 """
 
 import pickle
-#import pandas as pd
-#import openml
-#from openml.tasks import TaskType
-#import matplotlib.pyplot as plt
-#from matplotlib.cm import get_cmap
-#from matplotlib.ticker import FuncFormatter
 import numpy as np
 from sklearn.ensemble import BaggingClassifier
 from sklearn.calibration import CalibratedClassifierCV
@@ -39,9 +33,7 @@ from deslib.util.datasets import make_P2
 import sklearn.preprocessing as preprocessing
 import scipy.io as sio
 import time
-#import xlsxwriter
 import os
-#from datetime import datetime
 import warnings
 
 from myfunctions import *
@@ -177,7 +169,6 @@ datasets = {
 datasets = sorted(datasets)
 list_ds = []
 methods_names = []
-
 NO_datasets = len(datasets)
 whole_results = np.zeros([NO_datasets,NO_techniques,no_itr])
 
@@ -196,6 +187,7 @@ for datasetName in datasets:
         whole_results2 = whole_results[0:len(done_list),:,:]
         write_whole_results_into_excel(whole_results2, done_list, methods_names)
 
+write_whole_results_into_excel(whole_results, done_list, methods_names)
 path = "Results/With and without Callibration.p"
 rfile = open(path, mode="wb")
 pickle.dump(whole_results,rfile)
@@ -205,9 +197,9 @@ pickle.dump(methods_names,rfile)
 rfile.close()
 
 
-pdata = np.concatenate((whole_results[:,0:3 ,:],whole_results[:,10 :14,:],whole_results[:,21:22,:]) , axis=1)
-metName = methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]
-write_in_latex_table(pdata,done_list,metName,rows="datasets")
+# pdata = np.concatenate((whole_results[:,0:3 ,:],whole_results[:,10 :14,:],whole_results[:,21:22,:]) , axis=1)
+# metName = methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]
+# write_in_latex_table(pdata,done_list,metName,rows="datasets")
 write_in_latex_table(whole_results,done_list,methods_names,rows="datasets")
 
 
@@ -216,4 +208,4 @@ freq = 440  # Hz
 os.system('play -nq -t alsa synth {} sine {}'.format(duration, freq))
 print("STD:" , np.average(np.std(whole_results,2),0))
 
-methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]
+# methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]

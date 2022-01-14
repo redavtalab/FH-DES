@@ -7,8 +7,46 @@ from matplotlib.ticker import FuncFormatter
 from matplotlib.pyplot import *
 import Orange
 import xlsxwriter
+from deslib.util import *
+import scipy.io as sio
+
 import math
-def write_whole_results_into_excel(results,datasets,methods):
+def print_dataset_table(list_datasets):
+    NO_features = np.zeros((len(list_datasets)))
+    NO_samples = np.zeros((len(list_datasets)))
+    i =0
+
+    for datasetName in list_datasets:
+        redata = sio.loadmat("DataSets/" + datasetName + ".mat")
+        data = redata['dataset']
+        X = data[:, 0:-1]
+        y = data[:, -1]
+        NO_samples[i] = len(y)
+        NO_features[i] = np.size(X,1)
+
+        i+=1
+    datasets = {}
+
+    datasets['Group'] = ['*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*']
+    datasets['Name'] = list(list_datasets)
+    datasets['#Samples'] = NO_samples
+    datasets['#Features'] = NO_features
+    df = pd.DataFrame(datasets)
+    print(df.to_latex())
+
+
+
+
+def statistical_differences(y,yc,ym):
+    qtest_score = Q_statistic(y,yc,ym)
+    agrement_measure = agreement_measure(y,yc,ym)
+    correlation_coef = correlation_coefficient(y,yc,ym)
+    disagree_measure = disagreement_measure(y,yc,ym)
+    doub_fault = double_fault(y,yc,ym)
+    # ne_double_fault = negative_double_fault(y,yc,ym)
+    ratio_err = ratio_errors(y,yc,ym)
+    return np.round([qtest_score, agrement_measure, correlation_coef, disagree_measure, doub_fault, ratio_err],2)
+def write_whole_results_into_excel(results,datasets,methods,path = None):
     total_average = np.round(np.average(np.average(results, 2), 0), 2).reshape(1, len(methods))
     total_std = np.round(np.average(np.std(results, 2), 0), 2).reshape(1, len(methods))
 
@@ -19,8 +57,10 @@ def write_whole_results_into_excel(results,datasets,methods):
     ave = np.concatenate((ave, total_average), axis=0)
     std = np.concatenate((std, total_std), axis=0)
     datasets.append('Average')
-
-    workbook = xlsxwriter.Workbook('Results/excelFile.xlsx')
+    wpath = 'Results/excelFile.xlsx'
+    if path:
+        wpath = path
+    workbook = xlsxwriter.Workbook(wpath)
 
     # Write Accuracy Sheet
     worksheet = workbook.add_worksheet('Accuracy')
@@ -43,10 +83,10 @@ def write_whole_results_into_excel(results,datasets,methods):
 
 
 
-def save_elements(datasetName,itr,state,pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names):
+def save_elements(foldername,datasetName,itr,state,pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names):
 
     rng = np.random.RandomState(state)
-    path = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
+    path =  foldername + "/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
     poolspec = open(path, mode="wb")
     pickle.dump(state, poolspec)
     pickle.dump(pool_classifiers, poolspec)
@@ -58,8 +98,8 @@ def save_elements(datasetName,itr,state,pool_classifiers,X_train,y_train,X_test,
     pickle.dump(y_DSEL, poolspec)
     pickle.dump(list_ds, poolspec)
     pickle.dump(methods_names, poolspec)
-def load_elements(datasetName,itr,state):
-    filepath = "SavedPools/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
+def load_elements(foldername,datasetName,itr,state):
+    filepath = foldername + "/" + datasetName + str(itr) + "-RState-" + np.str(state) + ".p"
     poolspec = open(filepath, "rb")
     state = pickle.load(poolspec)
     pool_classifiers = pickle.load(poolspec)
@@ -95,10 +135,9 @@ def plot_CD(techniques, avranks,no_datasets):
     plt.show()
 
 def plot_winloss(techniques, win,tie,loss,nc,without_tie=True):
-
     if without_tie:
-        win += tie/2
-        loss += tie/2
+        win += tie / 2
+        loss += tie / 2
         tie = 0
     ind = np.arange(len(techniques))  # the x locations for the groups
     width = 0.35  # the width of the bars: can also be len(x) sequence
@@ -107,11 +146,11 @@ def plot_winloss(techniques, win,tie,loss,nc,without_tie=True):
 
     p1 = ax.bar(ind, win, width, label='Win')
     p2 = ax.bar(ind, tie, width, bottom=win, label='Tie')
-    p3 = ax.bar(ind, loss, width, bottom=win+tie, label='Loss')
+    p3 = ax.bar(ind, loss, width, bottom=win + tie, label='Loss')
 
     ax.axhline(nc, color='blue', linewidth=1.8)
-    ax.set_ylabel('Scores')
-    ax.set_title('Scores by group and gender')
+    ax.set_ylabel('# Datasets')
+    ax.set_title('Win-Tie-Loss')
     ax.set_xticks(ind)
     ax.set_xticklabels((techniques))
     ax.legend()
@@ -237,18 +276,26 @@ def plot_overallresult(average_accuracy,methods_name):
     ax.bar(np.arange(len(methods_name)),average_accuracy,color=colors,tick_label=methods_name, edgecolor='k')
     minlim = np.min(average_accuracy) - 2
     maxlim = np.max(average_accuracy) + 2
+
     ax.set_ylim(minlim, maxlim)
     ax.set_ylabel('Accuracy on the test set (%)', fontsize=13)
     ax.yaxis.set_major_formatter(pct_formatter)
     for tick in ax.get_xticklabels():
       tick.set_rotation(60)
     plt.subplots_adjust(bottom=0.18)
+
+    for item in ax.get_xticklabels(): item.set_rotation(90)
+    i = 0
+    for v in np.round(average_accuracy,2):
+        ax.text(i, v, "{:,}".format(v), va='bottom',ha='center')
+        i += 1
+    plt.tight_layout()
     plt.show()
     for na,ac in zip(methods_name,average_accuracy):
         print("Overall Accuracy {} = {}".format(na, ac))
 
-def read_whole_results():
-    path = "Results/With and without Callibration.p"
+def read_whole_results(path):
+    # path = "Results-DGA1033/With and without Callibration.p"
     rfile = open(path, mode="rb")
     results=pickle.load(rfile)
     datasets = pickle.load(rfile)

@@ -128,16 +128,17 @@ def run_process(datasetName):
             ###########################################################################
             #                               Training                                  #
             ###########################################################################
-            learner = DecisionTreeClassifier(random_state=rng, max_depth=10)
+            # learner = DecisionTreeClassifier(random_state=rng, max_depth=10)
+            learner = MLPClassifier(hidden_layer_sizes=(10,10),random_state=rng)
             # learner = Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None, random_state=rng)
-            calibratedmodel = CalibratedClassifierCV(learner, cv=5,method='isotonic')
+            # calibratedmodel = CalibratedClassifierCV(learner, cv=5,method='isotonic')
             # model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, ), random_state=rng)
             uncalibratedpool = BaggingClassifier(learner,n_estimators=NO_classifiers,bootstrap=True,
                                                  max_samples=1.0,
                                                  random_state=rng)
             # uncalibratedpool.fit(X_train, y_train)
 
-            pool_classifiers = BaggingClassifier(calibratedmodel, n_estimators=NO_classifiers, bootstrap=True,
+            pool_classifiers = BaggingClassifier(learner, n_estimators=NO_classifiers, bootstrap=True,
                                                  max_samples=1.0,
                                                  random_state=rng)
             pool_classifiers.fit(X_train,y_train)
@@ -147,7 +148,7 @@ def run_process(datasetName):
             if(save_all_results):
                 save_elements(ExperimentPath+"/Pools" ,datasetName,itr,state,pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names)
         else: # do_not_train
-            pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names = load_elements(ExperimentPath+"/Pools" , datasetName,itr,state)
+            pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names = load_elements(ExperimentPath , datasetName,itr,state)
         ###########################################################################
         #                               Generalization                            #
         ###########################################################################
@@ -176,35 +177,35 @@ NO_techniques = 13
 datasets = {
     #     Data set of DGA1033 report
     "Audit",
-    "Banana",
-    "Banknote",
-    "Blood",
-    "Breast",
-    "Car",
-    "Datausermodeling",
-    "Faults",
-    "German",
-    "Haberman",
-    "Heart",
-    "ILPD",
-    "Ionosphere",
-    "Laryngeal1",
-    "Laryngeal3",
-    "Lithuanian",
-    "Liver",
-    "Mammographic",
-    "Monk2",
-    "Phoneme",
-    "Pima",
-    "Sonar",
-    "Statlog",
-    "Steel",
-    "Thyroid",
-    "Vehicle",
-    "Vertebral",
-    "Voice3",
-    "Weaning",
-    "Wine"
+    # "Banana",
+    # "Banknote",
+    # "Blood",
+    # "Breast",
+    # "Car",
+    # "Datausermodeling",
+    # "Faults",
+    # "German",
+    # "Haberman",
+    # "Heart",
+    # "ILPD",
+    # "Ionosphere",
+    # "Laryngeal1",
+    # "Laryngeal3",
+    # "Lithuanian",
+    # "Liver",
+    # "Mammographic",
+    # "Monk2",
+    # "Phoneme",
+    # "Pima",
+    # "Sonar",
+    # "Statlog",
+    # "Steel",
+    # "Thyroid",
+    # "Vehicle",
+    # "Vertebral",
+    # "Voice3",
+    # "Weaning",
+    # "Wine"
 # "Iris"
     # "Wholesale",
     #  "Transfusion", low oracle accuracy

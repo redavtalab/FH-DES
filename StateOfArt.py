@@ -43,6 +43,7 @@ from myfunctions import *
 warnings.filterwarnings("ignore")
 
 # Prepare the DS techniques. Changing k value to 7.
+
 def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     knorau = KNORAU(pool_classifiers, k=k)
     kne = KNORAE(pool_classifiers, k=k)
@@ -80,7 +81,7 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     FH_10 = DESFHMW_prior(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=True)
 
-    FH_G = FHDES_Allboxes_GPU(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_GG = FHDES_Allboxes_GPU(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=True)
 
     oracle = Oracle(pool_classifiers)

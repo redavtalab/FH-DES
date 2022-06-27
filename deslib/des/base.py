@@ -3,6 +3,7 @@ from abc import ABCMeta
 import numpy as np
 from deslib.base import BaseDS
 from deslib.util.aggregation import (weighted_majority_voting_rule,
+                                     weighted_majority_voting_rule23,
                                      majority_voting_rule,
                                      aggregate_proba_ensemble_weighted)
 
@@ -205,12 +206,44 @@ class BaseDES(BaseDS):
                                                                 self.n_classes_
                                                                       ))
         else:
+
             selected_classifiers = self.select(competences)
             votes = np.ma.MaskedArray(predictions, ~selected_classifiers)
             predicted_label = weighted_majority_voting_rule(votes, competences,
                                                             np.arange(
                                                                 self.n_classes_
                                                                       ))
+
+            ###################################################### Removeing bad labels  ####################################33
+            # for i in range(len(query)):
+            #     if all(votes.mask[i, :] == False):
+            #         selected_labels = np.unique(predictions[i,:])
+            #         if len(selected_labels) < len(self.classes_):
+            #             print("ok")
+
+            # for qi , comp_clr_ind in zip(range(len(query)), np.argmax(competences_,axis=1)):
+            #     if(competences_[qi, comp_clr_ind]< min_competence):
+            #         bad_label = predictions[qi, comp_clr_ind]
+            #         inds = predictions[qi,:] == bad_label
+            #         competences_[qi,inds] = -1
+
+            # for i in range(len(query)):
+            #     if any(competences[i,:]==-1):
+            #         set = np.unique(predictions[competences == -1])
+            #         if(predicted_label[i] in set):
+            #             predicted_label[i] = 1
+
+
+            # for qi , comp_clr_ind in zip(range(len(query)), np.argmax(competences_,axis=1)):
+            #     if(competences_[qi, comp_clr_ind]< min_competence):
+            #         bad_label = predictions[qi, comp_clr_ind]
+            #         inds = predictions[qi,:] == bad_label
+            #         competences_[qi,inds] = -1
+
+            # ix, iy = np.where(competences == -1)
+            # predictions[ix,iy]
+            # predictions[competences == -1]
+            # if()
 
         return predicted_label
 
@@ -326,3 +359,5 @@ class BaseDES(BaseDS):
                 'Invalid value for parameter "mode".'
                 ' "mode" should be one of these options '
                 '{selection, hybrid, weighting}')
+
+

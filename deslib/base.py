@@ -525,15 +525,24 @@ class BaseDS(BaseEstimator, ClassifierMixin):
                         ind_ds_original_matrix]
                 else:
                     selected_probabilities = None
+                if hasattr(self, "HBoxes"):
+                    pred_ds = self.classify_with_ds(X,
+                                                    base_predictions,
+                                                    selected_probabilities,
+                                                    neighbors=neighbors,
+                                                    distances=distances,
+                                                    DFP_mask=DFP_mask)
+                    predicted_labels = pred_ds
 
-                pred_ds = self.classify_with_ds(X_DS[ind_ds_classifier],
-                                                base_predictions[
-                                                    ind_ds_original_matrix],
-                                                selected_probabilities,
-                                                neighbors=neighbors,
-                                                distances=distances,
-                                                DFP_mask=DFP_mask)
-                predicted_labels[ind_ds_original_matrix] = pred_ds
+                else:
+                    pred_ds = self.classify_with_ds(X_DS[ind_ds_classifier],
+                                                    base_predictions[
+                                                        ind_ds_original_matrix],
+                                                    selected_probabilities,
+                                                    neighbors=neighbors,
+                                                    distances=distances,
+                                                    DFP_mask=DFP_mask)
+                    predicted_labels[ind_ds_original_matrix] = pred_ds
 
         return self.classes_.take(predicted_labels)
 

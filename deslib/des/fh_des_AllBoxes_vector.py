@@ -232,12 +232,8 @@ class FHDES_Allboxes_vector(BaseDES):
             # Sort boxes by the distances
             hboxC = (hboxV + hboxW) / 2
             expanded = False
-            box_list = np.linalg.norm(X-hboxC)
+            box_list = np.linalg.norm(X-hboxC,axis=1)
 
-            # box_list = np.zeros((self.NO_hyperboxes,))
-            # for i, box in enumerate(boxes):
-            #     box_list[i] = np.linalg.norm(X - box.Center)
-                # box_list[i] = box.membership(X)
             sorted_indexes = np.argsort(box_list)[::-1]
             for ind in sorted_indexes:
                 # nearest_box = boxes[ind]
@@ -248,7 +244,6 @@ class FHDES_Allboxes_vector(BaseDES):
                         self.contract_samplesBased(hboxV, hboxW, ind, contraction_samples)
                         expanded = True
                         break
-
 
                 elif self.thetaCheck and not self.doContraction:
                     if self.is_expandable(hboxV, hboxW, ind, X):

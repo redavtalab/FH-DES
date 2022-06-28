@@ -35,9 +35,6 @@ class FHDES_Allboxes(BaseDES):
         self.mu = mu
         self.mis_sample_based = mis_sample_based
         self.HBoxes = []
-        self.hbV = []
-        self.hbw = []
-        self.hbC = []
         self.NO_hypeboxes = 0
         self.doContraction = doContraction
         self.thetaCheck = thetaCheck

@@ -35,8 +35,8 @@ class FHDES_Allboxes_vector(BaseDES):
         self.mu = mu
         self.mis_sample_based = mis_sample_based
         self.HBoxes = []
-        self.hboxMin = []
-        self.hboxMax = []
+        # self.hboxMin = []
+        # self.hboxMax = []
         self.NO_hypeboxes = 0
         self.doContraction = doContraction
         self.thetaCheck = thetaCheck
@@ -121,19 +121,18 @@ class FHDES_Allboxes_vector(BaseDES):
         if self.multiCore_process == False:
             for classifier_index in range(self.n_classifiers_):
                 [bV,bW] = self.setup_hyperboxs(classifier_index)
-                np.concatenate(self.hboxMin,bV)
-                np.concatenate(self.hboxMax,bW)
-
+                self.HBoxes.append(bV)
+                self.HBoxes.append(bW)
 
         else:
             # classifier_index = range(self.n_classifiers_)
             no_processes = int(multiprocessing.cpu_count() /2)+1
             with multiprocessing.Pool(processes=no_processes) as pool:
-                listBox = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
-                for item in listBox:
-                    self.hboxMin = np.concatenate(self.hboxMin, item[0])
-                    self.hboxMax = np.concatenate(self.hboxMax, item[1])
-                    self.NO_hypeboxes += len(listBox)
+                [bV,bW] = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
+                bV.shape()
+                bW.shape()
+                # self.hboxMin = np.concatenate((self.hboxMin, bV))
+                # self.hboxMin = np.concatenate((self.hboxMax, bW))
 
     def estimate_competence(self, query, neighbors=None, distances=None, predictions=None):
         boxes_classifier = np.zeros((len(self.HBoxes),1))
@@ -261,6 +260,7 @@ class FHDES_Allboxes_vector(BaseDES):
             if expanded == False:
                 xt = X.reshape(1, self.n_features_)
                 hboxV, hboxW = self.add_boxes(hboxV, hboxW, bV=xt, bW=xt)
+
 
 
         return hboxV, hboxW

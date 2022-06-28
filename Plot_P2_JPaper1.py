@@ -32,7 +32,7 @@ from deslib.dcs import OLA
 # from deslib.des import KNORAU
 # from deslib.des import KNOP
 # from deslib.des import METADES
-from deslib.des import FHDES_JFB,FHDES_Allboxes, FHDES_prior,DESFHMW_JFB, DESFHMW_allboxes,DESFHMW_prior
+from deslib.des import FHDES_JFB,FHDES_Allboxes, FHDES_prior,DESFHMW_JFB, DESFHMW_allboxes,DESFHMW_prior,FHDES_Allboxes_vector
 from deslib.util.datasets import *
 
 ###############################################################################
@@ -148,8 +148,11 @@ def initialize_ds(pool_classifiers, XDSEL, yDSEL, k=7):  # X_DSEL , y_DSEL
                        doContraction=True, thetaCheck=True, multiCore_process=True)
     FH_10 = DESFHMW_prior(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=True, multiCore_process=True)
+
+    FH_vec = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+                          doContraction=True, thetaCheck=True, multiCore_process=True)
     oracle = Oracle(pool_classifiers)
-    list_ds = [ ola, FH_7]
+    list_ds = [ ola, FH_vec]
     #    list_ds = [knorau, kne, lca, mla, desknn, mcb, rank, knop, meta, desfh]
     names = ['OLA','FH_1']
 

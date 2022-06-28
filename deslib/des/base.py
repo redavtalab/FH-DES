@@ -3,7 +3,6 @@ from abc import ABCMeta
 import numpy as np
 from deslib.base import BaseDS
 from deslib.util.aggregation import (weighted_majority_voting_rule,
-                                     weighted_majority_voting_rule23,
                                      majority_voting_rule,
                                      aggregate_proba_ensemble_weighted)
 

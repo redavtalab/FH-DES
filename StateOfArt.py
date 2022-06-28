@@ -131,7 +131,6 @@ def save_results(tec_name,datasetName,accuracy,labels,yhat):
     pickle.dump(yhat, poolspec)
     poolspec.close()
 
-
 def pool_generator(datasetName):
     state = 0
     pools = []
@@ -181,38 +180,34 @@ def evaluate_model(datasetName):
             else:
                 yhat.append(ds_tec[itr].predict(X_test))
 
-
-
-
-
         save_results(methods_names[tec],datasetName,results,labels,yhat)
 
 
 datasets = {
     #     Data set of DGA1033 report
-    "Audit",
-    "Banana",
-    "Banknote",
-    "Blood",
-    "Breast",
-    "Car",
-    "Datausermodeling",
-    "Faults",
-    "German",
-    "Haberman",
-    "Heart",
-    "ILPD",
-    "Ionosphere",
-    "Laryngeal1",
-    "Laryngeal3",
-    "Lithuanian",
-    "Liver",
-    "Mammographic",
-    "Monk2",
-    "Phoneme",
-    "Pima",
-    "Sonar",
-    "Statlog",
+    # "Audit",
+    # "Banana",
+    # "Banknote",
+    # "Blood",
+    # "Breast",
+    # "Car",
+    # "Datausermodeling",
+    # "Faults",
+    # "German",
+    # "Haberman",
+    # "Heart",
+    # "ILPD",
+    # "Ionosphere",
+    # "Laryngeal1",
+    # "Laryngeal3",
+    # "Lithuanian",
+    # "Liver",
+    # "Mammographic",
+    # "Monk2",
+    # "Phoneme",
+    # "Pima",
+    # "Sonar",
+    # "Statlog",
     "Steel",
     "Thyroid",
     "Vehicle",

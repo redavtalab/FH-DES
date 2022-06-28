@@ -17,6 +17,7 @@ from .des_FHMW_JFB import DESFHMW_JFB
 from .fh_des_JFB import FHDES_JFB
 from .des_FHMW_AllBoxes import DESFHMW_allboxes
 from .fh_des_AllBoxes import FHDES_Allboxes
+from .fh_des_AllBoxes_vector import FHDES_Allboxes_vector
 from .fh_des_AllBoxes_GPU import FHDES_Allboxes_GPU
 from .des_FHMW_prior import DESFHMW_prior
 from .fh_des_prior import FHDES_prior
@@ -35,6 +36,7 @@ __all__ = ['BaseDES',
            'FHDES_JFB',
            'DESFHMW_allboxes',
            'FHDES_Allboxes',
+           'FHDES_Allboxes_vector',
            'FHDES_Allboxes_GPU',
            'DESFHMW_prior',
            'FHDES_prior',

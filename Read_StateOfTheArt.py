@@ -86,7 +86,7 @@ datasets = sorted(datasets)
 no_itr = 20
 
 ExperimentPath = "Experiment1"
-methods_names = ['KNORA-U', 'KNORA-E' , 'DESKNN', 'OLA', 'RANK','FH-5']
+methods_names = ['KNORA-U', 'KNORA-E' , 'DESKNN', 'META-DES' , 'KNOP','MCB', 'RANK' , 'OLA','FH_4']
 No_methods = len(methods_names)
 
 
@@ -128,8 +128,8 @@ for dataInd, datasetName in enumerate(datasets):
 
 mf.write_in_latex_table(overall_results,datasets,methods_names)
 ##############################################         Win_Tie_Loss           #####################################
-compared_index = 4
-ind_list = list(chain (range(0,2), range(3,compared_index+1)))
+compared_index = -1
+ind_list = list(chain (range(0,3), range(3,len(methods_names)-1)))
 
 win = np.zeros((len(ind_list)-1,))
 tie = np.zeros((len(ind_list)-1,))
@@ -150,44 +150,18 @@ nc = math.floor(no_exp/2 + 1.645*np.sqrt(no_exp)/2)
 met_list = [methods_names[i] for i in ind_list[:-1]]
 mf.plot_winloss(met_list ,win,tie,loss,nc, without_tie = False)
 
-############################ Ranking - CD diagram  ############################
-# d_ranks = np.zeros_like(overall_results[:,0:-1,0])
-# del_inds = [i for i in range(len(methods_names)) if i not in ind_list]
-# errors_mat = 100 - np.delete(dataset_methods_acc,del_inds,1)
-#
-# d_ranks = rankdata(errors_mat,axis=1)
-#
-#
-# ranks = np.average(d_ranks,axis=0) - 1
-# m_list = [methods_names[i] for i in ind_list]
-# mf.plot_CD(m_list,ranks,len(datasets))
 
 ############################ Ranking - CD diagram  ############################
 
 d_ranks = np.zeros_like(overall_results[:,0:-1,0])
-# del_inds = [i for i in range(len(methods_name)) if i not in ind_list]
 errors_mat = 100 - np.delete(dataset_methods_acc,2,1)
 
 d_ranks = rankdata(errors_mat,axis=1)
-
 
 ranks = np.average(d_ranks,axis=0) - 1
 m_list = [methods_names[i] for i in chain(range(2),range(3,No_methods))]
 mf.plot_CD(m_list,ranks,len(datasets))
 
 
-# mean_20 = np.average(overall_results[:,0:6,:], axis=2)
-# err_mean_20 = 100 - mean_20
-# tt = rankdata(err_mean_20, axis=1)
-# mf.plot_multi_curve(tt[:,4:],["FH-DES-W" , "FH-DES-M" ] ,"Rank",range(20))
-#ranks = np.average(rankdata(err_mean_20, axis=1), axis=0)
-
-
-np.average(rankdata(np.average(overall_results, axis=2), axis=1), axis=0)
-np.average(rankdata(np.average(overall_results, axis=2), axis=1), axis=0)
-print("Overal Accuracy:")
-scores = np.average(np.average(overall_results, axis=2), axis=0)
-sc = np.concatenate((scores[:2],scores[3:]))
-# mf.plot_overallresult(sc, methods_name[0:2] + methods_name[3:])
 
 

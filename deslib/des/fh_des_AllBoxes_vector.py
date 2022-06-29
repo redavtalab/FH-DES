@@ -35,8 +35,8 @@ class FHDES_Allboxes_vector(BaseDES):
         self.mu = mu
         self.mis_sample_based = mis_sample_based
         self.HBoxes = []
-        self.hboxMin = []
-        self.hboxMax = []
+        # self.hboxMin = []
+        # self.hboxMax = []
         self.NO_hypeboxes = 0
         self.doContraction = doContraction
         self.thetaCheck = thetaCheck
@@ -54,24 +54,25 @@ class FHDES_Allboxes_vector(BaseDES):
 
 
     def add_boxes(self, hboxV, hboxW, bV, bW):
-        np.concatenate(hboxV, bV)
-        np.concatenate(hboxW, bW)
+        hboxV = np.concatenate((hboxV, bV))
+        hboxW = np.concatenate((hboxW, bW))
+        return hboxV, hboxW
+
     def expand_box(self, hboxV, hboxW, boxInd, x):
-        hboxV[boxInd] = min(hboxV[boxInd],x)
-        hboxW[boxInd] = min(hboxW[boxInd], x)
+        hboxV[boxInd] = np.minimum(hboxV[boxInd],x)
+        hboxW[boxInd] = np.maximum(hboxW[boxInd], x)
     def is_expandable(self,hboxV, hboxW, boxInd, x):
-        candV = min(hboxV[boxInd], x)
-        candW = min(hboxW[boxInd], x)
+        candV = np.minimum(hboxV[boxInd], x)
+        candW = np.maximum(hboxW[boxInd], x)
         return all((candW-candV) < self.theta)
     def is_inside(self,hboxV, hboxW, boxInd,x):
         return np.all(hboxV[boxInd] < x) and np.all(hboxW[boxInd] > x)
-    def membership_boxes(self,hboxV, hboxW,Xq):
+    def membership_boxes(self, hboxV, hboxW, Xq):
         NO_hypeboxes, n_features = hboxV.size()
         hboxC = np.add(hboxV, hboxW) / 2
-        boxes_W = hboxW .reshape(NO_hypeboxes, 1, n_features)
-        boxes_V = hboxV .reshape(NO_hypeboxes, 1, n_features)
+        boxes_W = hboxW.reshape(NO_hypeboxes, 1, n_features)
+        boxes_V = hboxV.reshape(NO_hypeboxes, 1, n_features)
         boxes_center = hboxC.reshape(NO_hypeboxes, 1, n_features)
-
         halfsize = ((boxes_W - boxes_V) / 2).reshape(NO_hypeboxes, 1, n_features)
         d = np.abs(boxes_center - Xq) - halfsize
         d[d < 0] = 0
@@ -80,16 +81,16 @@ class FHDES_Allboxes_vector(BaseDES):
         m = 1 - dd  # m: membership
         m =  np.power(m,6)
         return m
-    def will_exceed_samples(self, boxInd,x, con_samples):
-        candidV = np.minimum(self.hboxV[boxInd], x)
-        candidW = np.maximum(self.hboxW[boxInd], x)
+    def will_exceed_samples(self, hboxV, hboxW, boxInd,x, con_samples):
+        candidV = np.minimum(hboxV[boxInd], x)
+        candidW = np.maximum(hboxW[boxInd], x)
         V = candidV.reshape(1, self.n_features_)
         W = candidW.reshape(1, self.n_features_)
         return np.any(np.all(V <= con_samples, 1) & np.all(W >= con_samples, 1))
-    def contract_samplesBased(self, boxInd, con_samples):
+    def contract_samplesBased(self, hboxV, hboxW, boxInd, con_samples):
         di = 0
-        v = self.hboxV[boxInd]
-        w = self.hboxW[boxInd]
+        v = hboxV[boxInd]
+        w = hboxW[boxInd]
         mi = con_samples - v
         ma = w - con_samples
 
@@ -103,11 +104,10 @@ class FHDES_Allboxes_vector(BaseDES):
                 ma = w - con_samples[ind]
                 if min(mi) < min(ma):
                     d = np.where(mi == min(mi))
-                    self.hboxV[boxInd, d] = con_samples[ind, d]
+                    hboxV[boxInd, d] = con_samples[ind, d]
                 else:
                     d = np.where(ma == min(ma))
-                    self.hboxW[boxInd, d] = con_samples[ind, d]
-
+                    hboxW[boxInd, d] = con_samples[ind, d]
 
 
     def fit(self, X, y):
@@ -121,22 +121,19 @@ class FHDES_Allboxes_vector(BaseDES):
         if self.multiCore_process == False:
             for classifier_index in range(self.n_classifiers_):
                 [bV,bW] = self.setup_hyperboxs(classifier_index)
-                np.concatenate(self.hboxMin,bV)
-                np.concatenate(self.hboxMax,bW)
-
+                self.HBoxes.append(bV)
+                self.HBoxes.append(bW)
 
         else:
             # classifier_index = range(self.n_classifiers_)
             no_processes = int(multiprocessing.cpu_count() /2)+1
             with multiprocessing.Pool(processes=no_processes) as pool:
-                listBox = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
-                for item in listBox:
-                    self.hboxMin = np.concatenate(self.hboxMin, item[0])
-                    self.hboxMax = np.concatenate(self.hboxMax, item[1])
-                    self.NO_hypeboxes += len(listBox)
+                [bV,bW] = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
+                bV.shape()
+                bW.shape()
+                # self.hboxMin = np.concatenate((self.hboxMin, bV))
+                # self.hboxMin = np.concatenate((self.hboxMax, bW))
 
-
-    # def remove_bad_labels:
     def estimate_competence(self, query, neighbors=None, distances=None, predictions=None):
         boxes_classifier = np.zeros((len(self.HBoxes),1))
 
@@ -147,18 +144,15 @@ class FHDES_Allboxes_vector(BaseDES):
             self.hboxMin.append(self.HBoxes[i].Min)
         ###########################################################################
 
-
         if self.mis_sample_based:
             competences_ = np.ones([len(query), self.n_classifiers_])
         else:
             competences_ = np.zeros([len(query), self.n_classifiers_])
 
-
         Xq = query.reshape(1,len(query),self.n_features_)
 
         ## Membership Calculation
         m = self.membership_boxes(Xq)
-
 
         classifiers, indices, count = np.unique(boxes_classifier, return_counts = True,return_index = True)
         k = 0
@@ -176,7 +170,6 @@ class FHDES_Allboxes_vector(BaseDES):
                         competences_[i,int(clsr)] = 1
                     else:
                         competences_[i,int(clsr)] = clsrBoxes_m[b1[i],i] *0.7 + clsrBoxes_m[b2[i],i]*0.3
-
 
             else:  # In case that we have only one hyperbox for the classifier
                 for i in range(0, len(query)):
@@ -204,9 +197,10 @@ class FHDES_Allboxes_vector(BaseDES):
             samples_ind = self.DSEL_processed_[:, classifier]
             Contraction_ind = ~self.DSEL_processed_[:, classifier]
 
+        hboxV = np.zeros((1,self.n_features_)) - 1#np.array()
+        hboxW =np.zeros((1,self.n_features_)) - 1
 
-        hboxV = []
-        hboxW = []
+        #np.array()
 
         selected_samples = self.DSEL_data_[samples_ind, :]
 
@@ -215,23 +209,18 @@ class FHDES_Allboxes_vector(BaseDES):
         if self.shuffle_dataOrder:
             selected_samples = shuffle(selected_samples,random_state = classifier)
 
-
-
-
         for ind, X in enumerate(selected_samples):
             # Creation first box
-            if len(hboxV) < 1:
-                # Create the first Box
-                self.add_boxes(bV=X, bW=X)
-                # b = Hyperbox(v=X, w=X, classifier=classifier, theta=self.theta)
-                # self.NO_hypeboxes += 1
-                # boxes.append(b)
+            if hboxV[0,0] == -1:
+                hboxV[0, :] = X
+                hboxW[0, :] = X
+                # self.add_boxes(hboxV, hboxW, X, X)
                 continue
 
             # X is in a box?
             inFlage = False
-            for boxInd in range(self.NO_hypeboxes):
-                if self.is_inside(boxInd,X):
+            for boxInd in range(len(hboxV)):
+                if self.is_inside(hboxV, hboxW, boxInd,X):
                     inFlage = True
                     break
             if inFlage:
@@ -240,60 +229,38 @@ class FHDES_Allboxes_vector(BaseDES):
 
             ######################## Expand ############################
             # Sort boxes by the distances
+            hboxC = (hboxV + hboxW) / 2
             expanded = False
-            box_list = np.linalg.norm(X-self.hboxC)
+            box_list = np.linalg.norm(X-hboxC,axis=1)
 
-            # box_list = np.zeros((self.NO_hyperboxes,))
-            # for i, box in enumerate(boxes):
-            #     box_list[i] = np.linalg.norm(X - box.Center)
-                # box_list[i] = box.membership(X)
             sorted_indexes = np.argsort(box_list)[::-1]
             for ind in sorted_indexes:
                 # nearest_box = boxes[ind]
 
                 if self.thetaCheck and self.doContraction:
-                    if self.is_expandable(ind, X):
-                        self.expand(ind, X)
-                        self.contract_samplesBased(ind, contraction_samples)
+                    if self.is_expandable(hboxV, hboxW, ind, X):
+                        self.expand_box(hboxV, hboxW, ind, X)
+                        self.contract_samplesBased(hboxV, hboxW, ind, contraction_samples)
                         expanded = True
                         break
 
-
                 elif self.thetaCheck and not self.doContraction:
-                    if self.is_expandable(ind, X):
-                        self.expand(ind, X)
+                    if self.is_expandable(hboxV, hboxW, ind, X):
+                        self.expand(hboxV, hboxW, ind, X)
                         expanded = True
                         break
 
                 elif not self.thetaCheck and self.doContraction:
-                    if not self.will_exceed_samples(ind, X, contraction_samples):
-                        self.expand(ind, X)
+                    if not self.will_exceed_samples(hboxV, hboxW, ind, X, contraction_samples):
+                        self.expand(hboxV, hboxW, ind, X)
                         expanded = True
                         break
 
-                # if ((not self.thetaCheck) or nearest_box.is_expandable(X)) and (( not self.doContraction) or (not nearest_box.will_exceed_samples(X, contraction_samples))):
-                #     nearest_box.expand(X)
-                #     nearest_box.contract_samplesBased(contraction_samples)
-                #     expanded = True
-                #     break
 
-            # nDist = np.inf
-            # nearest_box = None
-            # for box in boxes:
-            #     dist = np.linalg.norm(X - box.Center)
-            #     if dist < nDist:
-            #         nearest_box = box
-            #         nDist = dist
-            # if (nearest_box.is_expandable(X) or (not self.thetaCheck)):
-            #     nearest_box.expand(X)
-            #     if (nearest_box.will_exceed_samples(X, contraction_samples)) and (self.doContraction):
-            #         nearest_box.contract_samplesBased(contraction_samples)
-            #     continue
-
-                ######################## Creation ############################
-            #            else:
             if expanded == False:
-                self.add_boxes(hboxV, hboxW, bV=X, bW=W)
+                xt = X.reshape(1, self.n_features_)
+                hboxV, hboxW = self.add_boxes(hboxV, hboxW, bV=xt, bW=xt)
+
 
 
         return hboxV, hboxW

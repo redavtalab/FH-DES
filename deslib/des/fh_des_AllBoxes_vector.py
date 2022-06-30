@@ -66,7 +66,7 @@ class FHDES_Allboxes_vector(BaseDES):
     def is_inside(self,hboxV, hboxW, boxInd,x):
         return np.all(hboxV[boxInd] < x) and np.all(hboxW[boxInd] > x)
     def membership_boxes(self, hboxV, hboxW, Xq):
-        NO_hypeboxes, n_features = hboxV.size()
+        NO_hypeboxes, n_features = hboxV.shape
         hboxC = np.add(hboxV, hboxW) / 2
         boxes_W = hboxW.reshape(NO_hypeboxes, 1, n_features)
         boxes_V = hboxV.reshape(NO_hypeboxes, 1, n_features)
@@ -137,50 +137,38 @@ class FHDES_Allboxes_vector(BaseDES):
                 # self.hboxMin = np.concatenate((self.hboxMax, bW))
 
     def estimate_competence(self, query, neighbors=None, distances=None, predictions=None):
-        boxes_classifier = np.zeros((len(self.HBoxes),1))
-
-        ###################################### should be removed after vectorize...
-        for i in range(len(self.HBoxes)):
-            boxes_classifier[i] = self.HBoxes[i]["clsr"]
-            hboxMin.append(self.HBoxes[i]["Min"])
-            hboxMax.append(self.HBoxes[i]["Max"])
-
-        ###########################################################################
 
         if self.mis_sample_based:
-            competences_ = np.ones([len(query), self.n_classifiers_])
+            highest_mems = np.ones([len(query), self.n_classifiers_])
         else:
-            competences_ = np.zeros([len(query), self.n_classifiers_])
+            highest_mems = np.zeros([len(query), self.n_classifiers_])
 
         Xq = query.reshape(1,len(query),self.n_features_)
 
-        ## Membership Calculation
-        m = self.membership_boxes(Xq)
+        for clsr in range(len(self.HBoxes)):
+            # c_range = range( indices[k], indices[k] + count[k])
+            hboxV = self.HBoxes[clsr]["Min"]
+            hboxW = self.HBoxes[clsr]["Max"]
 
-        classifiers, indices, count = np.unique(boxes_classifier, return_counts = True,return_index = True)
-        k = 0
-        for clsr in classifiers:
-            c_range = range( indices[k], indices[k] + count[k])
-            k+=1
-            clsrBoxes_m = m[c_range]
-            if len(c_range) > 1:
+            clsrBoxes_m = self.membership_boxes(hboxV,hboxW,Xq)
+            if len(hboxV) > 1:
                 #bb_indexes = np.argpartition(-clsrBoxes_m, kth=2, axis=0)[:2]
                 bb_indexes = np.argsort(-clsrBoxes_m, axis=0)
                 b1 = bb_indexes[0,:]
                 b2 = bb_indexes[1,:]
                 for i in range(0,len(query)):
                     if clsrBoxes_m[b1[i],i]==1 : # if the query sample is located inside or near to the box
-                        competences_[i,int(clsr)] = 1
+                        highest_mems[i,int(clsr)] = 1
                     else:
-                        competences_[i,int(clsr)] = clsrBoxes_m[b1[i],i] *0.7 + clsrBoxes_m[b2[i],i]*0.3
+                        highest_mems[i,int(clsr)] = clsrBoxes_m[b1[i],i] *0.7 + clsrBoxes_m[b2[i],i]*0.3
 
             else:  # In case that we have only one hyperbox for the classifier
                 for i in range(0, len(query)):
-                    competences_[i, int(clsr)] = clsrBoxes_m[0, i]
+                    highest_mems[i, int(clsr)] = clsrBoxes_m[0, i]
 
         #### was mistake ####
         if self.mis_sample_based:
-            competences_ = np.max(competences_) - competences_
+            competences_ = np.max(highest_mems) - highest_mems
             # competences_ = np.sqrt(self.n_features_)  - competences_
 
         scaler = preprocessing.MinMaxScaler()

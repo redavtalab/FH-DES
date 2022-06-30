@@ -35,8 +35,6 @@ class FHDES_Allboxes_vector(BaseDES):
         self.mu = mu
         self.mis_sample_based = mis_sample_based
         self.HBoxes = []
-        # self.hboxMin = []
-        # self.hboxMax = []
         self.NO_hypeboxes = 0
         self.doContraction = doContraction
         self.thetaCheck = thetaCheck
@@ -117,12 +115,16 @@ class FHDES_Allboxes_vector(BaseDES):
         if self.theta > 1 or self.theta <= 0:
             raise Exception("The value of Theta must be between 0 and 1.")
 
-
         if self.multiCore_process == False:
             for classifier_index in range(self.n_classifiers_):
                 [bV,bW] = self.setup_hyperboxs(classifier_index)
-                self.HBoxes.append(bV)
-                self.HBoxes.append(bW)
+                class_dic =  { "clsr" : classifier_index,
+                                  "Min" : bV,
+                                  "Max" : bW
+                                  }
+                self.NO_hypeboxes += len(bV)
+                self.HBoxes.append(class_dic)
+
 
         else:
             # classifier_index = range(self.n_classifiers_)
@@ -139,9 +141,10 @@ class FHDES_Allboxes_vector(BaseDES):
 
         ###################################### should be removed after vectorize...
         for i in range(len(self.HBoxes)):
-            boxes_classifier[i] = self.HBoxes[i].clsr
-            self.hboxMax.append(self.HBoxes[i].Max)
-            self.hboxMin.append(self.HBoxes[i].Min)
+            boxes_classifier[i] = self.HBoxes[i]["clsr"]
+            hboxMin.append(self.HBoxes[i]["Min"])
+            hboxMax.append(self.HBoxes[i]["Max"])
+
         ###########################################################################
 
         if self.mis_sample_based:

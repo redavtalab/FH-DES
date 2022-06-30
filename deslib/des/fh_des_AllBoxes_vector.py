@@ -118,21 +118,19 @@ class FHDES_Allboxes_vector(BaseDES):
         if self.multiCore_process == False:
             for classifier_index in range(self.n_classifiers_):
                 [bV,bW] = self.setup_hyperboxs(classifier_index)
-                class_dic =  { "clsr" : classifier_index,
-                                  "Min" : bV,
-                                  "Max" : bW
-                                  }
+                class_dic =  { "clsr" : classifier_index, "Min" : bV, "Max" : bW }
                 self.NO_hypeboxes += len(bV)
                 self.HBoxes.append(class_dic)
-
-
         else:
             # classifier_index = range(self.n_classifiers_)
             no_processes = int(multiprocessing.cpu_count() /2)+1
             with multiprocessing.Pool(processes=no_processes) as pool:
-                [bV,bW] = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
-                bV.shape()
-                bW.shape()
+                list = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
+                for clsr_box in list:
+                    class_dic = {"clsr": 0, "Min": clsr_box[0], "Max": clsr_box[1]}
+                    self.NO_hypeboxes += len(clsr_box[0])
+                    self.HBoxes.append(class_dic)
+
                 # self.hboxMin = np.concatenate((self.hboxMin, bV))
                 # self.hboxMin = np.concatenate((self.hboxMax, bW))
 

@@ -1,9 +1,5 @@
 # coding=utf-8
 
-# FH-DES with contraction process
-#     1- Check just the nearest hyperbox
-#     2- Create a new hyperbox if the nearst hyperboxox has contraction
-
 import numpy as np
 import matplotlib.pyplot as plt
 from deslib.des.base import BaseDES
@@ -122,7 +118,6 @@ class FHDES_Allboxes_vector(BaseDES):
                 self.NO_hypeboxes += len(bV)
                 self.HBoxes.append(class_dic)
         else:
-            # classifier_index = range(self.n_classifiers_)
             no_processes = int(multiprocessing.cpu_count() /2)+1
             with multiprocessing.Pool(processes=no_processes) as pool:
                 list = pool.map(self.setup_hyperboxs, range(self.n_classifiers_))
@@ -131,8 +126,6 @@ class FHDES_Allboxes_vector(BaseDES):
                     self.NO_hypeboxes += len(clsr_box[0])
                     self.HBoxes.append(class_dic)
 
-                # self.hboxMin = np.concatenate((self.hboxMin, bV))
-                # self.hboxMin = np.concatenate((self.hboxMax, bW))
 
     def estimate_competence(self, query, neighbors=None, distances=None, predictions=None):
 
@@ -175,7 +168,6 @@ class FHDES_Allboxes_vector(BaseDES):
         return competences_
 
     def setup_hyperboxs(self, classifier ):
-        #        print(np.size(samples_ind))
         if np.size(classifier) < 0:
             pass
 
@@ -189,8 +181,6 @@ class FHDES_Allboxes_vector(BaseDES):
         hboxV = np.zeros((1,self.n_features_)) - 1#np.array()
         hboxW =np.zeros((1,self.n_features_)) - 1
 
-        #np.array()
-
         selected_samples = self.DSEL_data_[samples_ind, :]
 
         contraction_samples = self.DSEL_data_[Contraction_ind,:]
@@ -203,7 +193,6 @@ class FHDES_Allboxes_vector(BaseDES):
             if hboxV[0,0] == -1:
                 hboxV[0, :] = X
                 hboxW[0, :] = X
-                # self.add_boxes(hboxV, hboxW, X, X)
                 continue
 
             # X is in a box?
@@ -224,8 +213,6 @@ class FHDES_Allboxes_vector(BaseDES):
 
             sorted_indexes = np.argsort(box_list)[::-1]
             for ind in sorted_indexes:
-                # nearest_box = boxes[ind]
-
                 if self.thetaCheck and self.doContraction:
                     if self.is_expandable(hboxV, hboxW, ind, X):
                         self.expand_box(hboxV, hboxW, ind, X)

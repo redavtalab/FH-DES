@@ -92,14 +92,14 @@ def convert_datasets(datasetName):
         X_DSEL, X_test, y_DSEL, y_test = train_test_split(X_test, y_test, test_size=0.5, stratify=y_test,
                                                           random_state=rng)  # stratify=y_test
         yhat[itr, :] = y_test
-        np.save('Datasets3/'+ datasetName+ str(itr) ,[X_train,X_test,X_DSEL,y_train,y_test,y_DSEL],)
+
 
         scaler = preprocessing.MinMaxScaler().fit(X_train)
         X_train = scaler.transform(X_train)
         X_test = scaler.transform(X_test)
         X_DSEL = scaler.transform(X_DSEL)
 
-
+        np.save('Datasets3/'+ datasetName+ str(itr) ,[X_train,X_test,X_DSEL,y_train,y_test,y_DSEL])
 
 
 no_itr = 20

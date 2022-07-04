@@ -196,12 +196,12 @@ class FHDES_Allboxes_vector(BaseDES):
                 continue
 
             # X is in a box?
-            inFlage = False
+            is_inBox = False
             for boxInd in range(len(hboxV)):
                 if self.is_inside(hboxV, hboxW, boxInd,X):
-                    inFlage = True
+                    is_inBox = True
                     break
-            if inFlage:
+            if is_inBox:
                 # nop
                 continue
 

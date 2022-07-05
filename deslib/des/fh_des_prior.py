@@ -1,9 +1,5 @@
 # coding=utf-8
 
-# FH-DES with contraction process
-#     1- Check just the nearest hyperbox
-#     2- Create a new hyperbox if the nearst hyperboxox has contraction
-
 import numpy as np
 import matplotlib.pyplot as plt
 from deslib.des.base import BaseDES
@@ -129,7 +125,6 @@ class FHDES_prior(BaseDES):
         #### was mistake ####
         if self.mis_sample_based:
             competences_ = np.max(competences_) - competences_
-            # competences_ = np.sqrt(self.n_features_)  - competences_
 
         scaler = preprocessing.MinMaxScaler()
         competences_ = scaler.fit_transform(competences_)
@@ -137,7 +132,6 @@ class FHDES_prior(BaseDES):
         return competences_
 
     def setup_hyperboxs(self, classifier ):
-        #        print(np.size(samples_ind))
         if np.size(classifier) < 0:
             pass
 
@@ -187,7 +181,6 @@ class FHDES_prior(BaseDES):
             box_list = np.zeros((len(boxes),))
             for i, box in enumerate(boxes):
                 box_list[i] = np.linalg.norm(X - box.Center)
-                # box_list[i] = box.membership(X)
             sorted_indexes = np.argsort(box_list)[::-1]
                         
             for ind in sorted_indexes:
@@ -198,12 +191,6 @@ class FHDES_prior(BaseDES):
                     expanded = True
                     break
 
-                    # if (not self.thetaCheck or nearest_box.is_expandable(X)) and (not self.doContraction or not nearest_box.will_exceed_samples(X, contraction_samples)):
-                #     nearest_box.expand(X)
-                #     nearest_box.contract_samplesBased(contraction_samples)
-                #     expanded = True
-                #     break
-
             ######################## Creation ############################
             #            else:
             if expanded == False:
@@ -211,7 +198,6 @@ class FHDES_prior(BaseDES):
                 boxes.append(b)
                 self.NO_hypeboxes += 1
 
-        # self.HBoxes.extend(boxes)
         return boxes
 
     def select(self, competences):

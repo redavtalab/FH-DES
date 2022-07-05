@@ -1,9 +1,5 @@
 # coding=utf-8
 
-# FH-DES with contraction process
-#     1- Check just the nearest hyperbox
-#     2- Create a new hyperbox if the nearst hyperboxox has contraction
-
 import numpy as np
 import matplotlib.pyplot as plt
 from deslib.des.base import BaseDES
@@ -60,7 +56,6 @@ class FHDES_Allboxes(BaseDES):
         if self.theta > 1 or self.theta <= 0:
             raise Exception("The value of Theta must be between 0 and 1.")
 
-
         if self.multiCore_process == False:
             for classifier_index in range(self.n_classifiers_):
                 boxes = self.setup_hyperboxs(classifier_index)
@@ -111,7 +106,6 @@ class FHDES_Allboxes(BaseDES):
             k+=1
             clsrBoxes_m = m[c_range]
             if len(c_range) > 1:
-                #bb_indexes = np.argpartition(-clsrBoxes_m, kth=2, axis=0)[:2]
                 bb_indexes = np.argsort(-clsrBoxes_m, axis=0)
                 b1 = bb_indexes[0,:]
                 b2 = bb_indexes[1,:]
@@ -157,9 +151,6 @@ class FHDES_Allboxes(BaseDES):
         ############################################################# Shuffle
         if self.shuffle_dataOrder:
             selected_samples = shuffle(selected_samples,random_state = classifier)
-
-
-
 
         for ind, X in enumerate(selected_samples):
             # Creation first box
@@ -212,33 +203,13 @@ class FHDES_Allboxes(BaseDES):
                         expanded = True
                         break
 
-                # if ((not self.thetaCheck) or nearest_box.is_expandable(X)) and (( not self.doContraction) or (not nearest_box.will_exceed_samples(X, contraction_samples))):
-                #     nearest_box.expand(X)
-                #     nearest_box.contract_samplesBased(contraction_samples)
-                #     expanded = True
-                #     break
-
-            # nDist = np.inf
-            # nearest_box = None
-            # for box in boxes:
-            #     dist = np.linalg.norm(X - box.Center)
-            #     if dist < nDist:
-            #         nearest_box = box
-            #         nDist = dist
-            # if (nearest_box.is_expandable(X) or (not self.thetaCheck)):
-            #     nearest_box.expand(X)
-            #     if (nearest_box.will_exceed_samples(X, contraction_samples)) and (self.doContraction):
-            #         nearest_box.contract_samplesBased(contraction_samples)
-            #     continue
-
-                ######################## Creation ############################
+            ######################## Creation ############################
             #            else:
             if expanded == False:
                 b = Hyperbox(v=X, w=X, classifier=classifier, theta=self.theta)
                 boxes.append(b)
                 self.NO_hypeboxes += 1
 
-        # self.HBoxes.extend(boxes)
         return boxes
 
     def select(self, competences):

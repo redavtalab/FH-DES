@@ -1,9 +1,5 @@
 # coding=utf-8
 
-# FH-DES with contraction process
-#     1- Check just the nearest hyperbox
-#     2- Create a new hyperbox if the nearst hyperboxox has contraction
-
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
@@ -159,9 +155,6 @@ class FHDES_JFB(BaseDES):
         if self.shuffle_dataOrder:
             selected_samples = shuffle(selected_samples,random_state = classifier)
 
-        # selected_samples = shuffle(selected_samples)
-
-
 
         for ind, X in enumerate(selected_samples):
             # Creation first box
@@ -213,18 +206,12 @@ class FHDES_JFB(BaseDES):
                     # expanded = True
                     continue
 
-            # if ((not self.thetaCheck) or nearest_box.is_expandable(X)) and ((not self.doContraction) or (not nearest_box.will_exceed_samples(X, contraction_samples))):
-            #     nearest_box.expand(X)
-            #     nearest_box.contract_samplesBased(contraction_samples)
-            #     continue
-
                 ######################## Creation ############################
             #            else:
             b = Hyperbox(v=X, w=X, classifier=classifier, theta=self.theta)
             boxes.append(b)
             self.NO_hypeboxes += 1
 
-        # self.HBoxes.extend(boxes)
         return boxes
 
     def select(self, competences):

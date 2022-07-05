@@ -222,13 +222,13 @@ class FHDES_Allboxes_vector(BaseDES):
 
                 elif self.thetaCheck and not self.doContraction:
                     if self.is_expandable(hboxV, hboxW, ind, X):
-                        self.expand(hboxV, hboxW, ind, X)
+                        self.expand_box(hboxV, hboxW, ind, X)
                         expanded = True
                         break
 
                 elif not self.thetaCheck and self.doContraction:
                     if not self.will_exceed_samples(hboxV, hboxW, ind, X, contraction_samples):
-                        self.expand(hboxV, hboxW, ind, X)
+                        self.expand_box(hboxV, hboxW, ind, X)
                         expanded = True
                         break
 

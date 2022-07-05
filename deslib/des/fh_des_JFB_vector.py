@@ -231,7 +231,7 @@ class FHDES_JFB_vector(BaseDES):
                     self.expand_box(hboxV, hboxW, nearestBox_ind, X)
                     expanded = True
                     continue
-
+            ######################## Creation ############################
             xt = X.reshape(1,self.n_features_)
             hboxV, hboxW = self.add_boxes(hboxV, hboxW, bV=xt, bW=xt)
 

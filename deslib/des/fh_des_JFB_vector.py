@@ -222,13 +222,13 @@ class FHDES_JFB_vector(BaseDES):
 
             elif self.thetaCheck and not self.doContraction:
                 if self.is_expandable(hboxV, hboxW, nearestBox_ind, X):
-                    self.expand(hboxV, hboxW, nearestBox_ind, X)
+                    self.expand_box(hboxV, hboxW, nearestBox_ind, X)
                     # expanded = True
                     continue
 
             elif not self.thetaCheck and self.doContraction:
                 if not self.will_exceed_samples(hboxV, hboxW, nearestBox_ind, X, contraction_samples):
-                    self.expand(hboxV, hboxW, nearestBox_ind, X)
+                    self.expand_box(hboxV, hboxW, nearestBox_ind, X)
                     expanded = True
                     continue
 

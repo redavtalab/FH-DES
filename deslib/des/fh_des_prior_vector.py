@@ -9,7 +9,7 @@ from deslib.util.instance_hardness import *
 import multiprocessing
 from sklearn.utils import shuffle
 
-class FHDES_Allboxes_vector(BaseDES):
+class FHDES_prior_vector(BaseDES):
 
     def __init__(self, pool_classifiers=None,
                  k=7, DFP=False,
@@ -38,7 +38,7 @@ class FHDES_Allboxes_vector(BaseDES):
         self.shuffle_dataOrder = shuffle_dataOrder
 
         ############### it should be based on Clustering #############################
-        super(FHDES_Allboxes_vector, self).__init__(pool_classifiers=pool_classifiers,
+        super(FHDES_prior_vector, self).__init__(pool_classifiers=pool_classifiers,
                                     with_IH=with_IH,
                                     safe_k=safe_k,
                                     IH_rate=IH_rate,
@@ -105,7 +105,7 @@ class FHDES_Allboxes_vector(BaseDES):
 
 
     def fit(self, X, y):
-        super(FHDES_Allboxes_vector, self).fit(X, y)
+        super(FHDES_prior_vector, self).fit(X, y)
         if self.mu > 1 or self.mu <= 0:
             raise Exception("The value of Mu must be between 0 and 1.")
         if self.theta > 1 or self.theta <= 0:
@@ -213,24 +213,11 @@ class FHDES_Allboxes_vector(BaseDES):
 
             sorted_indexes = np.argsort(box_list)[::-1]
             for ind in sorted_indexes:
-                if self.thetaCheck and self.doContraction:
-                    if self.is_expandable(hboxV, hboxW, ind, X):
-                        self.expand_box(hboxV, hboxW, ind, X)
-                        self.contract_samplesBased(hboxV, hboxW, ind, contraction_samples)
-                        expanded = True
-                        break
 
-                elif self.thetaCheck and not self.doContraction:
-                    if self.is_expandable(hboxV, hboxW, ind, X):
-                        self.expand(hboxV, hboxW, ind, X)
-                        expanded = True
-                        break
-
-                elif not self.thetaCheck and self.doContraction:
-                    if not self.will_exceed_samples(hboxV, hboxW, ind, X, contraction_samples):
-                        self.expand(hboxV, hboxW, ind, X)
-                        expanded = True
-                        break
+                if self.is_expandable(hboxV, hboxW, ind, X) and not self.will_exceed_samples(hboxV, hboxW, ind, X, contraction_samples):
+                    self.expand_box(hboxV, hboxW, ind, X)
+                    expanded = True
+                    break
 
             ######################## Creation ############################
             #            else:

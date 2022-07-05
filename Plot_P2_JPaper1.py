@@ -33,7 +33,7 @@ from deslib.dcs import OLA
 # from deslib.des import KNOP
 # from deslib.des import METADES
 from deslib.des import FHDES_JFB, FHDES_Allboxes, FHDES_prior, DESFHMW_JFB, DESFHMW_allboxes, DESFHMW_prior, \
-    FHDES_Allboxes_vector, fh_des_JFB_vector, FHDES_JFB_vector
+    FHDES_Allboxes_vector, fh_des_JFB_vector, FHDES_JFB_vector, FHDES_prior_vector, DESFHMW_JFB_vector
 from deslib.util.datasets import *
 
 ###############################################################################
@@ -148,12 +148,16 @@ def initialize_ds(pool_classifiers, XDSEL, yDSEL, k=7):  # X_DSEL , y_DSEL
     FH_10 = DESFHMW_prior(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=True, multiCore_process=True)
 
-    FH_vecAll = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_vecAll = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                               doContraction=True, thetaCheck=True, multiCore_process=False)
     FH_vecJFB = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
-                          doContraction=True, thetaCheck=True, multiCore_process=False)
+                                 doContraction=True, thetaCheck=True, multiCore_process=False)
+    FH_vecPrior = FHDES_prior_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+                                 doContraction=True, thetaCheck=True, multiCore_process=False)
+    FH_6v = DESFHMW_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+                       doContraction=True, thetaCheck=True, multiCore_process=False)
     oracle = Oracle(pool_classifiers)
-    list_ds = [ ola, FH_vecAll]
+    list_ds = [ ola, FH_6v]
     #    list_ds = [knorau, kne, lca, mla, desknn, mcb, rank, knop, meta, desfh]
     names = ['OLA','FH_1']
 
@@ -165,7 +169,7 @@ def initialize_ds(pool_classifiers, XDSEL, yDSEL, k=7):  # X_DSEL , y_DSEL
 
 # %% Parameters
 
-theta = .2
+theta = .5
 NO_samples = 500
 rng = 118
 
@@ -272,7 +276,7 @@ plt.tight_layout()
 #
 # Finally, let's evaluate the classification accuracy of DS techniques and
 # Bagging on the test set:
-print("NO_Hyperboxes is:", len(list_ds[1].HBoxes))
+print("NO_Hyperboxes is:", list_ds[1].NO_hypeboxes)
 
 for ds, name in zip(list_ds, names):
     print('Accuracy ' + name + ': ' + str(ds.score(X_test, y_test)))

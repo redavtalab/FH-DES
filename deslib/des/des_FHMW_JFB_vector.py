@@ -85,16 +85,17 @@ class DESFHMW_JFB_vector(BaseDES):
         W = candidW.reshape(1, self.n_features_)
         return np.any(np.all(V <= con_samples, 1) & np.all(W >= con_samples, 1))
     def contract_boxBased(self, bV, bW, coboxV , coboxW):
-        di = 0
-        
-        mi = bV > coboxV
-        ma = bW < coboxW
-            
-        inds1 = np.all(mi > 0, 1)
-        inds2 = np.all(ma > 0, 1)
-        confilicts_inds = np.where(inds1 & inds2)
+        condWiWk = bW - coboxW > 0
+        condViVk = bV - coboxV > 0
+        condWkVi = coboxW - bV > 0
+        condWiVk = bW - coboxV > 0
 
-
+        c1 = ~condWiWk & ~condViVk & condWiVk
+        c2 = condWiWk & condViVk & condWkVi
+        c3 = condWiWk & ~condViVk
+        c4 = ~condWiWk & condViVk
+        c = c1 + c2 + c3 + c4
+        confilicts_inds = np.where(c.all(axis=1))
         for ind in list(confilicts_inds[0]):
             minOverlap = np.inf
             dimOverlap = -1
@@ -269,7 +270,7 @@ class DESFHMW_JFB_vector(BaseDES):
             ######################## Creation ############################
             #            else:
             xt = x.reshape(1,self.n_features_)
-            nboxV, nboxW = self.add_boxes(hboxV, hboxW, bV=xt, bW=xt)
+            hboxV, hboxW = self.add_boxes(hboxV, hboxW, bV=xt, bW=xt)
 
             if y[ind] == False: # miss classified sample
                 nboxV = hboxV

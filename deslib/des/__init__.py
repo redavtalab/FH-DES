@@ -15,6 +15,8 @@ from .knora_u import KNORAU
 
 from .des_FHMW_JFB import DESFHMW_JFB
 from .des_FHMW_JFB_vector import DESFHMW_JFB_vector
+from .des_FHMW_prior_vector import DESFHMW_prior_vector
+from .des_FHMW_AllBoxes_vector import DESFHMW_allboxes_vector
 from .fh_des_JFB import FHDES_JFB
 from .des_FHMW_AllBoxes import DESFHMW_allboxes
 from .fh_des_AllBoxes import FHDES_Allboxes
@@ -37,6 +39,8 @@ __all__ = ['BaseDES',
 
            'DESFHMW_JFB',
            'DESFHMW_JFB_vector',
+           'DESFHMW_allboxes_vector',
+           'DESFHMW_prior_vector',
            'FHDES_JFB',
            'DESFHMW_allboxes',
            'FHDES_Allboxes',

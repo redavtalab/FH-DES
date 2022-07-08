@@ -173,7 +173,7 @@ class DESFHMW_allboxes_vector(BaseDES):
                 self.NO_hypeboxes += len(bV)
                 self.HBoxes.append(class_dic)
         else:
-            no_processes = int(multiprocessing.cpu_count() /2)+1
+            no_processes = int(multiprocessing.cpu_count() /1.2)+1
             with multiprocessing.Pool(processes=no_processes) as pool:
                 list = pool.map(self.FMM_train, range(self.n_classifiers_))
                 for clsr_box in list:

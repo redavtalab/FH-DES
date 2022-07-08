@@ -20,7 +20,8 @@ from deslib.dcs import OLA
 from deslib.dcs import MCB
 from deslib.dcs import Rank
 
-from deslib.des import DESKNN, FHDES_JFB, DESFHMW_JFB, DESFHMW_allboxes, FHDES_prior,FHDES_Allboxes_vector
+from deslib.des import DESKNN, FHDES_JFB, DESFHMW_JFB, DESFHMW_allboxes, FHDES_prior, FHDES_Allboxes_vector, \
+    FHDES_JFB_vector, DESFHMW_JFB_vector, FHDES_prior_vector, DESFHMW_prior_vector, DESFHMW_allboxes_vector
 from deslib.des import KNORAE
 from deslib.des import KNORAU
 from deslib.des import KNOP
@@ -56,35 +57,31 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     knop = KNOP(pool_classifiers, k=k)
     meta = METADES(pool_classifiers, k=k)
 
-    FH_1 = FHDES_JFB(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                      doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_2 = FHDES_JFB(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_2v = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                      doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_3 = FHDES_Allboxes(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_3v = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_4 = FHDES_Allboxes(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_4v = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_5 = FHDES_JFB(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_5v = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                      doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_6 = DESFHMW_JFB(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_6v = DESFHMW_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                        doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_7 = FHDES_Allboxes(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_7v = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_8 = DESFHMW_allboxes(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_8v = DESFHMW_allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                             doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_9 = FHDES_prior(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_9v = FHDES_prior_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                        doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_10 = DESFHMW_prior(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
+    FH_10v = DESFHMW_prior_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                           doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_GG = FHDES_Allboxes_GPU(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
-                          doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_vec = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
-                                   doContraction=True, thetaCheck=True, multiCore_process=False)
 
     oracle = Oracle(pool_classifiers)
     single_best = SingleBest(pool_classifiers, n_jobs=-1)

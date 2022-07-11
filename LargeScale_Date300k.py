@@ -26,15 +26,30 @@ import warnings
 import xlsxwriter
 import math
 from myfunctions import *
-
 warnings.filterwarnings("ignore")
 
+def load_pool(datasetName):
+    path = ExperimentPath + "/Pools/" + datasetName + "_pools.p"
+    poolspec = open(path, mode="rb")
+    return pickle.load(poolspec)
+def save_pool(datasetName):
+    state = 0
+    pools = []
+    for itr in range(0, no_itr):
+        rng = np.random.RandomState(state)
+        [X_train, X_test, X_DSEL, y_train, y_test, y_DSEL] =  np.load('Datasets3/' + datasetName +str(itr)+'.npy',allow_pickle=True)
 
-#+##############################################################################
+        learner = Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None, random_state=rng)
+        model = CalibratedClassifierCV(learner, cv='prefit' ,method='isotonic')
+        # model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, ), random_state=rng)
+        pool_classifiers = BaggingClassifier(model, n_estimators=NO_classifiers, bootstrap=True, max_samples=1.0, random_state=rng)
+        pool_classifiers.fit(X_train,y_train)
+        pools.append(pool_classifiers)
 
-
-# Prepare the DS techniques. Changing k value to 7.
-def initialize_ds(pool_classifiers, uncalibratedpool, X_DSEL, y_DSEL, k=7):
+    path = ExperimentPath + "/Pools/" + datasetName + "_pools.p"
+    poolspec = open(path, mode="wb")
+    pickle.dump(pools, poolspec)
+def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
                              doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
     FH_2v = FHDES_JFB_vector(pool_classifiers, k=k, theta=theta, mu=NO_Hyperbox_Thereshold, mis_sample_based=True,
@@ -79,8 +94,6 @@ def initialize_ds(pool_classifiers, uncalibratedpool, X_DSEL, y_DSEL, k=7):
             ds.fit(X_DSEL, y_DSEL)
 
     return list_ds, methods_names
-
-
 def write_NO_Hbox(Dataset,NO_HBox,M_Names):
     wpath = ExperimentPath + '/0' + Dataset + '.xlsx'
 
@@ -105,52 +118,34 @@ def write_results_to_file(EPath, accuracy,labels,yhat, methods, datasetName):
     pickle.dump(labels,rfile)
     pickle.dump(yhat,rfile)
     rfile.close()
-def run_process(X_train, X_DSEL, X_test, y_train, y_DSEL, y_test,n):
-
+def run_process(n):
     state = 0
     rng = np.random.RandomState(state)
     result_one_dataset = np.zeros((NO_techniques, no_itr))
+    [X_train, X_test, X_DSE, y_train, y_test, y_DSE] = np.load('Datasets3/' + datasetName + str(1) + '.npy', allow_pickle=True)
     predicted_labels = np.zeros((NO_techniques, no_itr,len(y_test)))
     yhat = np.zeros((no_itr, len(y_test)))
     NO_Box = np.zeros((no_itr,NO_techniques-2))
-
+    pools = load_pool(datasetName)
     for itr in range(0, no_itr):
+        print("Iteration:", itr)
         rng = np.random.RandomState(state)
-        if do_train:
+        [X_train, X_test, X_DSE, y_train, y_test, y_DSE] = np.load('Datasets3/' + datasetName + str(itr) + '.npy',allow_pickle=True)
+        X_DSEL=X_DSE[:n, :]
+        y_DSEL = y_DSE[:n]
+        yhat[itr, :] = y_test
 
-            yhat[itr, :] = y_test
+        ###########################################################################
+        #                               Training                                  #
+        ###########################################################################
+        pool_classifiers = pools[itr]
+        list_ds, methods_names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
+        for method_ind in range(2, NO_techniques):
+            NO_Box[itr,method_ind - 2] = list_ds[method_ind].NO_hypeboxes
 
-            ###########################################################################
-            #                               Training                                  #
-            ###########################################################################
-            learner = Perceptron(max_iter=100, tol=10e-3, alpha=0.001, penalty=None, random_state=rng)
-            calibratedmodel = CalibratedClassifierCV(learner, cv=5,method='isotonic')
-            # learner = MLPClassifier(hidden_layer_sizes=(10, 10), random_state=rng)
-            # model = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, ), random_state=rng)
-            uncalibratedpool = BaggingClassifier(learner,n_estimators=NO_classifiers,bootstrap=True,
-                                                 max_samples=1.0,
-                                                 random_state=rng)
-            # uncalibratedpool.fit(X_train, y_train)
-
-            pool_classifiers = BaggingClassifier(calibratedmodel, n_estimators=NO_classifiers, bootstrap=True,
-                                                 max_samples=1.0,
-                                                 random_state=rng)
-            pool_classifiers.fit(X_train,y_train)
-
-            list_ds, methods_names = initialize_ds(pool_classifiers,uncalibratedpool, X_DSEL, y_DSEL, k=7)
-            # for i in range(2,12):
-            #     print("NO_samples: ", len(y_DSEL) ,"Methode: ", methods_names[i], "NO-HBox: ", len(list_ds[i].HBoxes),)
-            for method_ind in range(2, NO_techniques):
-                NO_Box[itr,method_ind - 2] = list_ds[method_ind].NO_hypeboxes
-
-            if(save_all_results):
-                save_elements(ExperimentPath+"/Pools" ,datasetName + np.str(n),itr,state,pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names)
-        else: # do_not_train
-            pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names = load_elements(ExperimentPath , datasetName + np.str(n),itr,state)
         ###########################################################################
         #                               Generalization                            #
         ###########################################################################
-
         for ind in range(0, len(list_ds)):
             result_one_dataset[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
             if ind==1: # Oracle results --> y should be passed too.
@@ -174,40 +169,24 @@ NO_techniques = 12
 list_ds = []
 methods_names = []
 # n_samples_ = [ 1000, 10000, 100000, 300000, 500000, 700000,900000]
-n_samples_ = [  1000, 300000 ]
+n_samples_ = [100,300000]
+
+datasetName = "Data"
+# datasetName = "Sensor"
+
 NO_datasets = len(n_samples_)
 whole_results = np.zeros([NO_datasets,NO_techniques,no_itr])
-
-
 dataset_count = 0
 done_list = []
 
-
-####################################################################################
-                              # First Dataset (Data)
-###################################################################################
-X, y = make_classification(n_samples=n_samples_[-1] + 2000,
-                           n_features=5,
-                           random_state=1)
-
-scaler = preprocessing.MinMaxScaler()
-X = scaler.fit_transform(X)
-
-X_DSE, X_tt, y_DSE , y_tt = train_test_split(X, y, test_size=2000, stratify=y, random_state=1)  # stratify=y
-datasetName = "Data"
-####################################################################################################
-# Spliting the Tarin and Test data
-X_train, X_test, y_train, y_test = train_test_split(X_tt, y_tt, test_size=0.5, stratify=y_tt,
-                                                                random_state=1)  # stratify=y
-
 for n in n_samples_:
-    X_DSEL = X_DSE[:n,:]
-    y_DSEL = y_DSE[:n]
-    # print("X_DSEL size is:",X_DSEL.shape)
-    result,methods_names,list_ds = run_process(X_train, X_DSEL, X_test, y_train, y_DSEL,  y_test,n)
+    start = time.time()
+    print("X_DSEL size is:",n)
+    result,methods_names,list_ds = run_process(n)
     whole_results[dataset_count,:,:] = result
     dataset_count +=1
     done_list.append(datasetName+np.str(n))
+    print("Run Time: ", time.time()-start)
 
 write_whole_results_into_excel(ExperimentPath,whole_results, done_list.copy(), methods_names)
 path = ExperimentPath + "/WholeResults.p"
@@ -220,50 +199,3 @@ rfile.close()
 
 write_in_latex_table(whole_results,done_list,methods_names,rows="datasets")
 
-
-
-####################################################################################
-#                               Second Dataset (Sensor)
-####################################################################################
-#
-# whole_results = np.zeros([NO_datasets,NO_techniques,no_itr])
-#
-#
-# dataset_count = 0
-# done_list = []
-#
-# # Sensor Dataset ############################################################################################
-# redata = sio.loadmat("LargDatasets/Sensor_900.mat")
-# data = redata['dataset']
-# X_DSE = data[:, 0:-1]
-# y_DSE = data[:, -1]
-#
-# redata = sio.loadmat("LargDatasets/Sensor_tt.mat")
-# ttdata = redata['dataset']
-# X_tt = ttdata[:, 0:-1] # Tarin and Test data
-# y_tt = ttdata[:, -1]
-# datasetName = "Sensor"
-#
-# # Spliting the Tarin and Test data
-# X_train, X_test, y_train, y_test = train_test_split(X_tt, y_tt, test_size=0.5, stratify=y_tt,
-#                                                                 random_state=1)  # stratify=y
-#
-# for n in n_samples_:
-#     X_DSEL = X_DSE[:n,:]
-#     y_DSEL = y_DSE[:n]
-#     print("X_DSEL size is:",X_DSEL.shape)
-#     result,methods_names,list_ds = run_process(X_train, X_DSEL, X_test, y_train, y_DSEL,  y_test,n)
-#     whole_results[dataset_count,:,:] = result
-#     dataset_count +=1
-#     done_list.append(datasetName+np.str(n))
-#
-# write_whole_results_into_excel(ExperimentPath,whole_results, done_list.copy(), methods_names)
-# path = ExperimentPath + "/WholeResults.p"
-# rfile = open(path, mode="wb")
-# pickle.dump(whole_results,rfile)
-# datasets = done_list
-# pickle.dump(datasets,rfile)
-# pickle.dump(methods_names,rfile)
-# rfile.close()
-#
-# write_in_latex_table(whole_results,done_list,methods_names,rows="datasets")

@@ -87,12 +87,7 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     single_best = SingleBest(pool_classifiers, n_jobs=-1)
     majority_voting = pool_classifiers
 
-    list_ds = [knorau, kne, desknn, ola, rank, knop, meta, mcb, FH_4]
-    # list_ds = [majority_voting, single_best, oracle, knorau, kne, desknn, ola, rank, knop, meta, mcb, fh_4]
-              # fhM_cY_tN, fhM_cY_tY]
-    # methods_names = ['KNORA-U', 'KNORA-E', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES', 'MCB']
-    # # methods_names = ['MV', 'SB', 'Oracle', 'KNORA-U', 'KNORA-E', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES', 'MCB', 'FH_4']
-    #                 # 'FHm_cN_tY','FHm_cY_tN','FHm_cY_tY' ]
+    list_ds = [majority_voting, oracle,FH_1v, FH_2v, FH_3v, FH_4v, FH_5v, FH_6v, FH_7v, FH_8v, FH_9v, FH_10v]
 
     # fit the ds techniques
     for ds in list_ds:
@@ -222,11 +217,12 @@ NO_Hyperbox_Thereshold = 0.85
 ExperimentPath = "Experiment1"
 NO_classifiers =100
 no_itr = 20
-generate_pools = True
+generate_pools = False
 do_train = True
 do_evaluate = True
 
-methods_names = ['KNORA-U', 'KNORA-E', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES', 'MCB']
+methods_names = ['MV', 'Oracle','FH_IJC', 'FH_2', 'FH_3', 'FH_4', 'FH_5', 'FH_6', 'FH_7', 'FH_8', 'FH_9', 'FH_10']
+# 'FH_IJC', 'FH_2', 'FH_3', 'FH_4', 'FH_5', 'FH_6', 'FH_7', 'FH_8', 'FH_9', 'FH_10'
 NO_techniques = len(methods_names)
 
 start = time.time()

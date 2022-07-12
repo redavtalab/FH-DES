@@ -82,9 +82,9 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     single_best = SingleBest(pool_classifiers, n_jobs=-1)
     majority_voting = pool_classifiers
 
-    list_ds = [meta, oracle , FH_1v, FH_2v, FH_3v, FH_4v, FH_5v, FH_6v, FH_7v, FH_8v, FH_9v, FH_10v]
+    list_ds = [FH_1v, FH_3v, FH_5v, FH_6v, FH_7v, FH_8v]
 
-    methods_names = ['META-DES', 'Oracle', 'FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
+    methods_names = ['FH_1v', 'FH_3v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v']
     # # methods_names = ['MV', 'SB', 'Oracle', 'KNORA-U', 'KNORA-E', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES', 'MCB', 'FH_4']
     #                 # 'FHm_cN_tY','FHm_cY_tN','FHm_cY_tY' ]
 
@@ -125,7 +125,7 @@ def run_process(n):
     [X_train, X_test, X_DSE, y_train, y_test, y_DSE] = np.load('Datasets3/' + datasetName + str(1) + '.npy', allow_pickle=True)
     predicted_labels = np.zeros((NO_techniques, no_itr,len(y_test)))
     yhat = np.zeros((no_itr, len(y_test)))
-    NO_Box = np.zeros((no_itr,NO_techniques-2))
+    NO_Box = np.zeros((no_itr,NO_techniques))
     pools = load_pool(datasetName)
     for itr in range(0, no_itr):
         print("Iteration:", itr)
@@ -140,20 +140,20 @@ def run_process(n):
         ###########################################################################
         pool_classifiers = pools[itr]
         list_ds, methods_names = initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7)
-        for method_ind in range(2, NO_techniques):
-            NO_Box[itr,method_ind - 2] = list_ds[method_ind].NO_hypeboxes
+        for method_ind in range(NO_techniques):
+            NO_Box[itr,method_ind ] = list_ds[method_ind].NO_hypeboxes
 
         ###########################################################################
         #                               Generalization                            #
         ###########################################################################
         for ind in range(0, len(list_ds)):
             result_one_dataset[ind, itr] = list_ds[ind].score(X_test, y_test) * 100
-            if ind==1: # Oracle results --> y should be passed too.
+            if list_ds[ind] == 'Oracle': # Oracle results --> y should be passed too.
                 predicted_labels[ind, itr, :] = list_ds[ind].predict(X_test,y_test)
                 continue
             predicted_labels[ind, itr,:] = list_ds[ind].predict(X_test)
         state += 1
-    write_NO_Hbox(datasetName+np.str(n),NO_Box, methods_names[2:])
+    write_NO_Hbox(datasetName+np.str(n),NO_Box, methods_names)
     write_results_to_file(ExperimentPath, result_one_dataset, predicted_labels, yhat, methods_names, datasetName+np.str(n))
     return result_one_dataset,methods_names,list_ds
 
@@ -164,12 +164,12 @@ NO_classifiers =100
 no_itr = 5
 save_all_results = False
 do_train = True
-NO_techniques = 12
+NO_techniques = 6
 
 list_ds = []
 methods_names = []
 # n_samples_ = [ 1000, 10000, 100000, 300000, 500000, 700000,900000]
-n_samples_ = [100,100000]
+n_samples_ = [100000]
 
 datasetName = "Data"
 # datasetName = "Sensor"

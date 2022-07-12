@@ -168,11 +168,11 @@ NO_techniques = 12
 
 list_ds = []
 methods_names = []
-n_samples_ = [ 1000, 10000, 100000, 300000, 500000, 700000,900000]
+# n_samples_ = [ 1000, 10000, 100000, 300000, 500000, 700000,900000]
+n_samples_ = [100,100000]
 
-
-datasetName = "Data"
-# datasetName = "Sensor"
+# datasetName = "Data"
+datasetName = "Sensor"
 
 NO_datasets = len(n_samples_)
 whole_results = np.zeros([NO_datasets,NO_techniques,no_itr])

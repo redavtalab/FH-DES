@@ -86,7 +86,8 @@ datasets = sorted(datasets)
 no_itr = 20
 
 ExperimentPath = "Experiment1"
-methods_names = ['KNORA-U', 'KNORA-E' , 'DESKNN', 'META-DES' , 'KNOP','MCB', 'RANK' , 'OLA','FH_4']
+# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES', 'FH_7v']
+methods_names = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
 No_methods = len(methods_names)
 
 
@@ -129,7 +130,8 @@ for dataInd, datasetName in enumerate(datasets):
 mf.write_in_latex_table(overall_results,datasets,methods_names)
 ##############################################         Win_Tie_Loss           #####################################
 compared_index = -1
-ind_list = list(chain (range(0,3), range(3,len(methods_names)-1)))
+# ind_list = list(chain (range(0,3), range(3,len(methods_names)-1)))
+ind_list = range(len(methods_names))
 
 win = np.zeros((len(ind_list)-1,))
 tie = np.zeros((len(ind_list)-1,))
@@ -146,7 +148,7 @@ for ind in ind_list[:-1]:
     tie[kk] = no_exp - no_win - no_loss
     kk +=1
 
-nc = math.floor(no_exp/2 + 1.645*np.sqrt(no_exp)/2)
+nc = no_exp/2 + 1.645*np.sqrt(no_exp)/2
 met_list = [methods_names[i] for i in ind_list[:-1]]
 mf.plot_winloss(met_list ,win,tie,loss,nc, without_tie = False)
 
@@ -154,12 +156,14 @@ mf.plot_winloss(met_list ,win,tie,loss,nc, without_tie = False)
 ############################ Ranking - CD diagram  ############################
 
 d_ranks = np.zeros_like(overall_results[:,0:-1,0])
-errors_mat = 100 - np.delete(dataset_methods_acc,2,1)
+# errors_mat = 100 - np.delete(dataset_methods_acc,2,1)
+errors_mat = 100 - dataset_methods_acc
 
 d_ranks = rankdata(errors_mat,axis=1)
 
 ranks = np.average(d_ranks,axis=0) - 1
-m_list = [methods_names[i] for i in chain(range(2),range(3,No_methods))]
+# m_list = [methods_names[i] for i in chain(range(2),range(3,No_methods))]
+m_list = [methods_names[i] for i in range(No_methods)]
 mf.plot_CD(m_list,ranks,len(datasets))
 
 

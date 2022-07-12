@@ -221,7 +221,7 @@ generate_pools = False
 do_train = True
 do_evaluate = True
 
-methods_names = ['MV', 'Oracle','FH_IJC', 'FH_2', 'FH_3', 'FH_4', 'FH_5', 'FH_6', 'FH_7', 'FH_8', 'FH_9', 'FH_10']
+methods_names = ['MV', 'Oracle','FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
 # 'FH_IJC', 'FH_2', 'FH_3', 'FH_4', 'FH_5', 'FH_6', 'FH_7', 'FH_8', 'FH_9', 'FH_10'
 NO_techniques = len(methods_names)
 

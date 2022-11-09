@@ -163,6 +163,67 @@ def plot_winloss(techniques, win,tie,loss,nc,without_tie=True):
 
     plt.show()
 
+def plot_winloss_2(techniques1,techniques2 , win, tie, loss, nc, without_tie=True):
+    if without_tie:
+        win += tie / 2
+        loss += tie / 2
+        tie = 0
+    # ind = np.arange(len(techniques1))  # the x locations for the groups
+    # width = 0.35  # the width of the bars: can also be len(x) sequence
+    #
+    # fig, ax = plt.subplots()
+    #
+    # p1 = ax.bar(ind, win, width, label='Win')
+    # p2 = ax.bar(ind, tie, width, bottom=win, label='Tie')
+    # p3 = ax.bar(ind, loss, width, bottom=win + tie, label='Loss')
+
+    # ax.axhline(nc, color='blue', linewidth=1.8)
+    # ax.set_ylabel('# Datasets')
+    # ax.set_title('Win-Tie-Loss')
+    # ax.set_xticks(ind)
+    # ax.set_xticklabels((techniques1))
+    # ax.legend()
+    #
+    # # Label with label_type 'center' instead of the default 'edge'
+    # ax.bar_label(p1, label_type='center')
+    # ax.bar_label(p3, label_type='center')
+
+    data = np.array([win, tie, loss])
+    data = data.T
+    category_names = ['# Win (Based on Missclassified samples)', 'Tie', '# Win (Based on correct classified samples)']
+
+    labels = techniques1
+    data_cum = data.cumsum(axis=1)
+    category_colors = plt.colormaps['RdYlGn'](
+        np.linspace(0.15, 0.85, data.shape[1]))
+
+    fig, ax = plt.subplots(figsize=(9.2, 5))
+    ax.invert_yaxis()
+    ax.xaxis.set_visible(False)
+    ax.set_xlim(0, np.sum(data, axis=1).max())
+
+    for i, (colname, color) in enumerate(zip(category_names, category_colors)):
+        widths = data[:, i]
+        starts = data_cum[:, i] - widths
+        rects = ax.barh(labels, widths, left=starts, height=0.7,
+                        label=colname, color=color)
+
+        r, g, b, _ = color
+        text_color = 'white' if r * g * b < 0.5 else 'darkgrey'
+        ax.bar_label(rects, label_type='center', color=text_color)
+    ax.legend(ncol=len(category_names), bbox_to_anchor=(0, 1),
+              loc='lower left', fontsize='small')
+    ax.set_ylabel("Variants based on misclassified samples")
+
+    ax2 = ax.twinx()
+    techniques2.insert(0,' ')
+    techniques2.append(' ')
+    ax2.set_yticks(np.arange(12), labels=techniques2)
+    ax2.set_ylabel("Variants based on correct classified samples")
+    ax2.invert_yaxis()
+    ax.axvline(nc, color='blue', linewidth=1.8)
+    plt.show()
+
 def print_Acc_STD_onedataset(datasetName,methods_name,result):
     print("Results for Dataset " + datasetName)
     ave_acc = np.average(result, 1)
@@ -216,6 +277,15 @@ def plot_Acc_STD(results, dataset_names, hyperparameter_range):
 
 def write_in_latex_table(results, dataset_names, method_names, rows="datasets"):
 
+    #### Adding IJCNN Results
+    if(method_names[0] == "FH_1v" or method_names[0] == "FH_1"):
+        sd1 = [0.92, 1.68, 0.50, 2.64, 1.61, 1.25, 3.63, 2.03, 2.27, 3.98, 4.42, 2.59, 1.37, 3.49, 4.08, 2.32, 4.34, 2.73,
+               3.24, 0.91, 2.72, 5.42, 2.00, 1.33, 1.37, 2.41, 3.23, 3.09, 4.39, 1.71]
+    if (method_names[0] == "FH_1p"):
+        sd1 = [.74, 2.37, .66, 1.98, 1.49, 1.08, 3.93, 1.84, 2.0, 3.88, 3.89, 3.1, 2.21, 3.25, 4.15, 2.08, 4.77, 3.2, 2.85,
+           .97, 2.46, 6.41, 1.91, 1.67, 1.32, 2.1, 3.54, 3.42, 4.94, 2.23]
+
+
     if rows == "datasets":
         NO_datasets, NO_methods, no_itr = results.shape
         datasets = dataset_names.copy()
@@ -223,20 +293,41 @@ def write_in_latex_table(results, dataset_names, method_names, rows="datasets"):
         dic = {}
         dic['DataSets'] = list(datasets)
         total_average = np.round( np.average(np.average(results,2),0),2).reshape(1,len(method_names))
-        total_std = np.round( np.average(np.std(results,2),0),2).reshape(1,len(method_names))
+        # total_std = np.round( np.average(np.std(results,2),0),2).reshape(1,len(method_names))
+
 
         ave = np.round(np.average(results, 2), 2)
         std = np.round(np.std(results, 2), 2)
+
+        if (method_names[0] == "FH_1v" or method_names[0] == "FH_1"):
+            method_names[0] = "FH_IJC"
+            total_average[0, 0] = 81.89
+            std[:, 0] = sd1
+        if (method_names[0] == "FH_1p" or method_names[0] == "FH_1"):
+            method_names[0] = "FH_IJC"
+            total_average[0, 0] = 81.43
+            std[:, 0] = sd1
+
+        total_std = np.zeros((1,len(method_names))) + 777
         ave = np.concatenate((ave, total_average), axis=0)
         std = np.concatenate((std, total_std), axis=0)
-
+        maxs = np.max(ave,1)
 
         sha = ave.shape
         ave = ave.flatten().astype(str)
         std = std.flatten().astype(str)
         Tval = [ac + '(' + st + ')' for ac, st in zip(ave, std)]
         Tval = np.array(Tval)
+        ave = ave.reshape(sha).astype(float)
         Tval = Tval.reshape(sha)
+        # Tval.dtype = ('<U24')
+
+        for i in range(sha[0]):
+            for j in range(sha[1]):
+                if ave[i, j] == maxs[i]:
+                    Tval[i,j] = "**" + Tval[i, j]
+
+
 
         dic.update({na: list(val) for na, val in zip(method_names, Tval.transpose())})
         df = pd.DataFrame(dic)
@@ -274,10 +365,10 @@ def plot_overallresult(average_accuracy,methods_name):
     cmap = get_cmap('Dark2')
     colors = [cmap(i) for i in np.linspace(0, 1, 12)]
     fig, ax = plt.subplots(figsize=(8, 6.5))
-    pct_formatter = FuncFormatter(lambda x, pos: '{:.1f}'.format(x * 100))
+    pct_formatter = FuncFormatter(lambda x, pos: '{:.1f}'.format(x))
     ax.bar(np.arange(len(methods_name)),average_accuracy,color=colors,tick_label=methods_name, edgecolor='k')
-    minlim = np.min(average_accuracy) - 2
-    maxlim = np.max(average_accuracy) + 2
+    minlim = np.min(average_accuracy) - 1
+    maxlim = np.max(average_accuracy) + 1
 
     ax.set_ylim(minlim, maxlim)
     ax.set_ylabel('Accuracy on the test set (%)', fontsize=13)

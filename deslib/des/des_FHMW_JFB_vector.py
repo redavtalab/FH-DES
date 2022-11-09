@@ -204,6 +204,8 @@ class DESFHMW_JFB_vector(BaseDES):
         if self.mis_sample_based:
             competences_ = np.max(highest_mems) - highest_mems
             # competences_ = np.sqrt(self.n_features_)  - competences_
+        else:
+            competences_ = highest_mems
 
         scaler = preprocessing.MinMaxScaler()
         competences_ = scaler.fit_transform(competences_)
@@ -284,8 +286,10 @@ class DESFHMW_JFB_vector(BaseDES):
                 nboxV = coboxV
                 nboxW = coboxW
 
-
-        return nboxV, nboxW
+        if self.mis_sample_based:
+            return nboxV, nboxW
+        else:
+            return pboxV, pboxW
 
     def select(self, competences):
 

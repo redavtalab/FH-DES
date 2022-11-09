@@ -53,7 +53,6 @@ class DESFHMW_prior_vector(BaseDES):
         hboxV = np.concatenate((hboxV, bV))
         hboxW = np.concatenate((hboxW, bW))
         return hboxV, hboxW
-
     def expand_box(self, hboxV, hboxW, boxInd, x):
         hboxV[boxInd] = np.minimum(hboxV[boxInd],x)
         hboxW[boxInd] = np.maximum(hboxW[boxInd], x)
@@ -230,6 +229,8 @@ class DESFHMW_prior_vector(BaseDES):
         if self.mis_sample_based:
             competences_ = np.max(highest_mems) - highest_mems
             # competences_ = np.sqrt(self.n_features_)  - competences_
+        else:
+            competences_ = highest_mems
 
         scaler = preprocessing.MinMaxScaler()
         competences_ = scaler.fit_transform(competences_)
@@ -304,8 +305,10 @@ class DESFHMW_prior_vector(BaseDES):
 
             nboxV, nboxW, pboxV, pboxW = self.update_boxes(hboxV, hboxW, coboxV, coboxW,missClassified)
 
-
-        return nboxV, nboxW
+        if self.mis_sample_based:
+            return nboxV, nboxW
+        else:
+            return pboxV, pboxW
 
     def select(self, competences):
 

@@ -55,31 +55,31 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     knop = KNOP(pool_classifiers, k=k)
     meta = METADES(pool_classifiers, k=k)
 
-    FH_1p = FHDES_JFB_vector(pool_classifiers, k=k, theta=.6, mu=.1, mis_sample_based=False,
+    FH_1p = FHDES_JFB_vector(pool_classifiers, k=k, theta=.27, mu=.99, mis_sample_based=False,
                              doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
     FH_2p = FHDES_JFB_vector(pool_classifiers, k=k, theta=0.001, mu=.4, mis_sample_based=False,
                              doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_3p = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=.5, mu=.3, mis_sample_based=False,
+    FH_3p = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=.8, mu=.1, mis_sample_based=False,
                                   doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_4p = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=0.001, mu=.1, mis_sample_based=False,
+    FH_4p = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=0.001, mu=.4, mis_sample_based=False,
                                   doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_5p = FHDES_JFB_vector(pool_classifiers, k=k, theta=.7, mu=.1, mis_sample_based=False,
+    FH_5p = FHDES_JFB_vector(pool_classifiers, k=k, theta=.8, mu=.3, mis_sample_based=False,
                              doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_6p = DESFHMW_JFB_vector(pool_classifiers, k=k, theta=.7, mu=.5, mis_sample_based=False,
+    FH_6p = DESFHMW_JFB_vector(pool_classifiers, k=k, theta=.99, mu=.4, mis_sample_based=False,
                                doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_7p = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=.4, mu=.4, mis_sample_based=False,
+    FH_7p = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=.8, mu=.1, mis_sample_based=False,
                                   doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_8p = DESFHMW_allboxes_vector(pool_classifiers, k=k, theta=.5, mu=.4, mis_sample_based=False,
+    FH_8p = DESFHMW_allboxes_vector(pool_classifiers, k=k, theta=.99, mu=.1, mis_sample_based=False,
                                     doContraction=True, thetaCheck=True, multiCore_process=True,
                                     shuffle_dataOrder=False)
 
-    FH_9p = FHDES_prior_vector(pool_classifiers, k=k, theta=.7, mu=.7, mis_sample_based=False,
+    FH_9p = FHDES_prior_vector(pool_classifiers, k=k, theta=.99, mu=.2, mis_sample_based=False,
                                doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_10p = DESFHMW_prior_vector(pool_classifiers, k=k, theta=.9, mu=.7, mis_sample_based=False,
+    FH_10p = DESFHMW_prior_vector(pool_classifiers, k=k, theta=.8, mu=.6, mis_sample_based=False,
                                   doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
 # FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=.6, mu=.1, mis_sample_based=True,

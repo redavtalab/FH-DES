@@ -37,8 +37,6 @@ def print_dataset_table(list_datasets):
     print(df.to_latex())
 
 
-
-
 def statistical_differences(y,yc,ym):
     qtest_score = Q_statistic(y,yc,ym)
     agrement_measure = agreement_measure(y,yc,ym)
@@ -81,8 +79,6 @@ def write_whole_results_into_excel(path,results,datasets,methods):
 
 
     workbook.close()
-
-
 
 def save_elements(foldername,datasetName,itr,state,pool_classifiers,X_train,y_train,X_test,y_test,X_DSEL,y_DSEL,list_ds,methods_names):
 
@@ -276,6 +272,92 @@ def plot_Acc_STD(results, dataset_names, hyperparameter_range):
         ax.errorbar(mu_list, accuracy, STD, fmt='-o',uplims=True, lolims=True, label=dsname)
 
 def write_in_latex_table(results, dataset_names, method_names, rows="datasets"):
+    #
+    # #### Adding IJCNN Results
+    # if(method_names[0] == "FH_1v" or method_names[0] == "FH_1"):
+    #     sd1 = [0.92, 1.68, 0.50, 2.64, 1.61, 1.25, 3.63, 2.03, 2.27, 3.98, 4.42, 2.59, 1.37, 3.49, 4.08, 2.32, 4.34, 2.73,
+    #            3.24, 0.91, 2.72, 5.42, 2.00, 1.33, 1.37, 2.41, 3.23, 3.09, 4.39, 1.71]
+    # if (method_names[0] == "FH_1p"):
+    #     sd1 = [.74, 2.37, .66, 1.98, 1.49, 1.08, 3.93, 1.84, 2.0, 3.88, 3.89, 3.1, 2.21, 3.25, 4.15, 2.08, 4.77, 3.2, 2.85,
+    #        .97, 2.46, 6.41, 1.91, 1.67, 1.32, 2.1, 3.54, 3.42, 4.94, 2.23]
+
+
+    if rows == "datasets":
+        NO_datasets, NO_methods, no_itr = results.shape
+        datasets = dataset_names.copy()
+        datasets.append("Average")
+        dic = {}
+        dic['DataSets'] = list(datasets)
+        total_average = np.round( np.average(np.average(results,2),0),2).reshape(1,len(method_names))
+        # total_std = np.round( np.average(np.std(results,2),0),2).reshape(1,len(method_names))
+
+
+        ave = np.round(np.average(results, 2), 2)
+        std = np.round(np.std(results, 2), 2)
+
+        # if (method_names[0] == "FH_1v" or method_names[0] == "FH_1"):
+        #     method_names[0] = "FH_IJC"
+        #     total_average[0, 0] = 81.89
+        #     std[:, 0] = sd1
+        # if (method_names[0] == "FH_1p" or method_names[0] == "FH_1"):
+        #     method_names[0] = "FH_IJC"
+        #     total_average[0, 0] = 81.43
+        #     std[:, 0] = sd1
+
+        total_std = np.zeros((1,len(method_names))) + 777
+        ave = np.concatenate((ave, total_average), axis=0)
+        std = np.concatenate((std, total_std), axis=0)
+        maxs = np.max(ave,1)
+
+        sha = ave.shape
+        ave = ave.flatten().astype(str)
+        std = std.flatten().astype(str)
+        Tval = [ac + '(' + st + ')' for ac, st in zip(ave, std)]
+        Tval = np.array(Tval)
+        ave = ave.reshape(sha).astype(float)
+        Tval = Tval.reshape(sha)
+        # Tval.dtype = ('<U24')
+
+        for i in range(sha[0]):
+            for j in range(sha[1]):
+                if ave[i, j] == maxs[i]:
+                    Tval[i,j] = "**" + Tval[i, j]
+
+
+
+        dic.update({na: list(val) for na, val in zip(method_names, Tval.transpose())})
+        df = pd.DataFrame(dic)
+        print(df.to_latex(index=False))
+
+        av_acc = np.round(np.average(results, (0,2)),2)
+        print(av_acc)
+
+        ## Average STD:
+        #av_std = np.round(np.average(np.std(results, 2),0),2)
+        #for (aav, ast) in zip (av_acc,av_std):
+        #    print(aav,"(",ast,"),")
+
+    else:
+        NO_datasets ,NO_methods, no_itr =results.shape
+        dic={}
+        dic['Methods'] = list(method_names)
+
+        ave = np.round(np.average(results,2),2)
+        std = np.round(np.std(results,2),2)
+
+        sha=ave.shape
+        ave= ave.flatten().astype(str)
+        std=std.flatten().astype(str)
+
+        Tval = [ac+'('+st+')' for ac,st in zip(ave,std)]
+        Tval = np.array(Tval)
+        Tval = Tval.reshape(sha)
+
+        dic.update({na:list(val) for na, val in zip(dataset_names,Tval)})
+        df = pd.DataFrame(dic)
+        print(df.to_latex(index=False))
+
+def write_in_latex_table_IJCNN(results, dataset_names, method_names, rows="datasets"):
 
     #### Adding IJCNN Results
     if(method_names[0] == "FH_1v" or method_names[0] == "FH_1"):

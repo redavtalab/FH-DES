@@ -159,3 +159,59 @@ nc = no_exp/2 + 1.645*np.sqrt(no_exp)/2
 met_list = [methods_p[i] for i in ind_list[:-1]]
 mf.plot_winloss_2(methods_v,methods_p ,win,tie,loss,nc, without_tie = False)
 
+
+############################ Ranking - CD diagram  ############################
+methods_names = ['FH_1p', 'FH_2p', 'FH_3p', 'FH_4p', 'FH_5p', 'FH_6p', 'FH_7p', 'FH_8p', 'FH_9p', 'FH_10p', 'FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
+# methods_names = ['MV//////////////', 'SB', 'FMM', 'FH_2v', 'FH_4v','FH_9v']
+No_methods = len(methods_names)
+
+
+##### Reading Pickle File
+dataset_counter = 0
+overall_results = np.zeros((len(datasets), No_methods, no_itr))
+for dataInd, datasetName in enumerate(datasets):
+    result = []
+    for  tecInd, tecName in enumerate(methods_names):
+        accuracy, labels, yhat = read_results(tecName,datasetName)
+        overall_results[dataInd,tecInd,:] = accuracy
+
+
+
+overall_results[:, 0, :] = overall_results_p[:, 0, :]
+overall_results[:, 10, :] = overall_results_v[:, 0, :]
+
+dataset_methods_acc = np.average(overall_results,2)
+
+d_ranks = np.zeros_like(overall_results[:,0:-1,0])
+# errors_mat = 100 - np.delete(dataset_methods_acc,2,1)
+errors_mat = 100 - dataset_methods_acc
+
+d_ranks = rankdata(errors_mat,axis=1)
+
+ranks = np.average(d_ranks,axis=0) - 1
+# m_list = [methods_names[i] for i in range(No_methods)]
+# mf.plot_CD(m_list,ranks,len(datasets))
+
+
+print("Overal Accuracy:")
+scores = np.average(np.average(overall_results, axis=2), axis=0)
+# sc = np.concatenate((scores[:2],scores[3:]))
+# scores[0] = 81.89
+# mf.plot_overallresult(scores, methods_names)
+print(np.round(ranks,2))
+
+
+
+no_boxes = np.array([2967.84, 2398.24,4011.54,1444.26,2202.37,2200.05,4780.79,4017.83,2801.23,11647.79,1299.37,1411.64,1649.7,1009.43,986.15,983.82,1941.52,1647.06,1466.46,4158])
+fig, ax = plt.subplots()
+ax.scatter(ranks[0:10],no_boxes[0:10],marker='o', color='green', label='Variant based on correct classified samples')
+ax.scatter(ranks[10:],no_boxes[10:],marker='o', color='red', label='Variant based on miss classified samples')
+for i, name in enumerate(methods_names):
+    ax.annotate(name, (ranks[i]-.3,no_boxes[i]* 1.06))
+ax.set_yscale('log',base=10, subs=[2,3,4,5,6,7,8])
+plt.xlabel('Average Rank')
+plt.ylabel('Average NO. hyperbox')
+plt.legend()
+plt.grid(False)
+plt.show()
+print(np.round(ranks,2))

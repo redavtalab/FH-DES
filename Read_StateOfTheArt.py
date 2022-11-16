@@ -127,7 +127,7 @@ if (methods_names[0] == "FH_1p" or methods_names[0] == "FH_1"):
 
 
 ####################################    Write in latex      ###################################################
-mf.write_in_latex_table(overall_results,datasets,methods_names)
+mf.write_in_latex_table_IJCNN(overall_results,datasets,methods_names)
 
 ##############################################         Win_Tie_Loss           #####################################
 compared_index = -1

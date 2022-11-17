@@ -202,12 +202,16 @@ print(np.round(ranks,2))
 
 
 
-no_boxes = np.array([2967.84, 2398.24,4011.54,1444.26,2202.37,2200.05,4780.79,4017.83,2801.23,11647.79,1299.37,1411.64,1649.7,1009.43,986.15,983.82,1941.52,1647.06,1466.46,4158])
+no_boxes = np.array([2967.84 , 2398.24,  1736.15 , 1444.26 , 1862.45 , 1436.19 , 1738.9 ,  1298.86,  2307. , 11685.39
+                        ,1299.37,1411.64,1649.7,1009.43,986.15,983.82,1941.52,1647.06,1466.46,4158])
 fig, ax = plt.subplots()
 ax.scatter(ranks[0:10],no_boxes[0:10],marker='o', color='green', label='Variant based on correct classified samples')
 ax.scatter(ranks[10:],no_boxes[10:],marker='o', color='red', label='Variant based on miss classified samples')
 for i, name in enumerate(methods_names):
-    ax.annotate(name, (ranks[i]-.3,no_boxes[i]* 1.06))
+    if i==4 or i==6:
+        ax.annotate(name, (ranks[i]-.3,no_boxes[i]* 1.06))
+    else:
+        ax.annotate(name, (ranks[i] - .3, no_boxes[i] * 0.90))
 ax.set_yscale('log',base=10, subs=[2,3,4,5,6,7,8])
 plt.xlabel('Average Rank')
 plt.ylabel('Average NO. hyperbox')

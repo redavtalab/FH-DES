@@ -210,14 +210,15 @@ NO_techniques = len(methods_names)
 start = time.time()
 n_samples_ = [100,1000,10000, 100000, 300000, 500000, 700000,900000 ]
 datasets ={
-            "Data"
-           , "Sensor"
+           "Data" ,
+           "Sensor"
            }
 
 for datasetName in datasets:
     # try:
     print(datasetName)
     for n in n_samples_:
+        print(datasetName,n)
         t1 = time.time()
         model_setup(datasetName,n)
         print("Execution time:",time.time()-t1)

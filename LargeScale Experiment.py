@@ -208,10 +208,10 @@ methods_names = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 
 NO_techniques = len(methods_names)
 
 start = time.time()
-n_samples_ = [10,100]
+n_samples_ = [100,1000,10000, 100000, 300000, 500000, 700000,900000 ]
 datasets ={
             "Data"
-          # , "Sensor"
+           , "Sensor"
            }
 
 for datasetName in datasets:

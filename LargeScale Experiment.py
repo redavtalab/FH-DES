@@ -144,7 +144,7 @@ def load_model(tec_name,datasetName):
     path = ExperimentPath + "/Models/" + tec_name +"_"+ datasetName + "_model.p"
     poolspec = open(path, mode="rb")
     return pickle.load(poolspec)
-def save_results(tec_name,datasetName,accuracy,labels,yhat):
+def save_results(tec_name,datasetName,accuracy,labels,yhat,noBoxes):
     folder =  ExperimentPath + "/Results/"
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -153,12 +153,15 @@ def save_results(tec_name,datasetName,accuracy,labels,yhat):
     pickle.dump(accuracy, poolspec)
     pickle.dump(labels, poolspec)
     pickle.dump(yhat, poolspec)
+    pickle.dump(noBoxes,poolspec)
+    poolspec.flush()
     poolspec.close()
 def model_setup(datasetName, no_samples):
     global methods_names
     pools = load_pool(datasetName)
     ds_matrix = []
     for itr in range(no_itr):
+
         pool_classifiers = pools[itr]
         [X_train, X_test, X_DSE, y_train, y_test, y_DSE] = np.load('Datasets3/' + datasetName + str(itr) + '.npy',allow_pickle=True)
         X_DSEL=X_DSE[:no_samples, :]
@@ -168,20 +171,15 @@ def model_setup(datasetName, no_samples):
         ds_matrix.append(list_ds)
 
     for tec in range(NO_techniques):
+
         # ds_tec = []
         results = []
         labels = []
         yhat = []
-
+        noBoxes = 0
         for itr in range(no_itr):
             ds_itr = ds_matrix[itr][tec]
-        # save_model(methods_names[tec],datasetName,ds_tec)
 
-# def evaluate_model(datasetName):
-#     for tec in range(NO_techniques):
-
-        # ds_tec = load_model(methods_names[tec],datasetName)
-        # for itr in range(no_itr):
             [X_train, X_test, X_DSEL, y_train, y_test, y_DSEL] = np.load('Datasets3/' + datasetName + str(itr) + '.npy',  allow_pickle=True)
             labels.append(y_test)
             results.append(ds_itr.score(X_test, y_test) * 100)
@@ -189,10 +187,8 @@ def model_setup(datasetName, no_samples):
                 yhat.append(ds_itr.predict(X_test,y_test))
             else:
                 yhat.append(ds_itr.predict(X_test))
-
-        save_results(methods_names[tec],datasetName +np.str(no_samples),results,labels,yhat)
-
-
+            noBoxes += len(ds_itr.HBoxes)
+        save_results(methods_names[tec],datasetName +np.str(no_samples),results,labels,yhat,noBoxes)
 
 theta = .0
 NO_Hyperbox_Thereshold = 0
@@ -210,8 +206,8 @@ NO_techniques = len(methods_names)
 start = time.time()
 n_samples_ = [100,1000,10000, 100000, 300000, 500000, 700000,900000 ]
 datasets ={
-            "Data"
-           , "Sensor"
+            "Data",
+            "Sensor"
            }
 
 for datasetName in datasets:
@@ -220,7 +216,7 @@ for datasetName in datasets:
     for n in n_samples_:
         t1 = time.time()
         model_setup(datasetName,n)
-        print("Execution time:",time.time()-t1)
+        print("Execution time:", n ,time.time()-t1)
 
 
 

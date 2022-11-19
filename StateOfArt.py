@@ -139,6 +139,7 @@ def save_model(tec_name,datasetName,ds):
     path = ExperimentPath + "/Models/" + tec_name +"_"+datasetName + "_model.p"
     poolspec = open(path, mode="wb")
     pickle.dump(ds, poolspec)
+    poolspec.flush()
     poolspec.close()
 def load_model(tec_name,datasetName):
     path = ExperimentPath + "/Models/" + tec_name +"_"+ datasetName + "_model.p"
@@ -151,6 +152,7 @@ def save_results(tec_name,datasetName,accuracy,labels,yhat):
     pickle.dump(accuracy, poolspec)
     pickle.dump(labels, poolspec)
     pickle.dump(yhat, poolspec)
+    poolspec.flush()
     poolspec.close()
 
 def pool_generator(datasetName):

@@ -187,7 +187,9 @@ def model_setup(datasetName, no_samples):
                 yhat.append(ds_itr.predict(X_test,y_test))
             else:
                 yhat.append(ds_itr.predict(X_test))
-            noBoxes += len(ds_itr.HBoxes)
+            noBoxes += ds_itr.NO_hypeboxes
+        noBoxes = noBoxes/no_itr
+        print(methods_names[tec], noBoxes)
         save_results(methods_names[tec],datasetName +np.str(no_samples),results,labels,yhat,noBoxes)
 
 theta = .0

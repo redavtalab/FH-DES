@@ -119,9 +119,9 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     list_ds = [FH_1v, FH_2v, FH_3v, FH_4v, FH_5v, FH_6v, FH_7v, FH_8v, FH_9v, FH_10v]
 
     # fit the ds techniques
-    for ds in list_ds:
-        if ds != majority_voting:
-            ds.fit(X_DSEL, y_DSEL)
+    # for ds in list_ds:
+    #     if ds != majority_voting:
+    #         ds.fit(X_DSEL, y_DSEL)
 
 
     return list_ds, methods_names
@@ -178,9 +178,13 @@ def model_setup(datasetName, no_samples):
         yhat = []
         noBoxes = 0
         for itr in range(no_itr):
-            ds_itr = ds_matrix[itr][tec]
-
             [X_train, X_test, X_DSEL, y_train, y_test, y_DSEL] = np.load('Datasets3/' + datasetName + str(itr) + '.npy',  allow_pickle=True)
+            X_DSEL = X_DSE[:no_samples, :]
+            y_DSEL = y_DSE[:no_samples]
+
+            ds_itr = ds_matrix[itr][tec]
+            ds_itr.fit(X_DSEL, y_DSEL)
+
             labels.append(y_test)
             results.append(ds_itr.score(X_test, y_test) * 100)
             if methods_names[tec] == 'Oracle':
@@ -209,7 +213,7 @@ start = time.time()
 n_samples_ = [100,1000,10000, 100000, 300000, 500000, 700000,900000 ]
 datasets ={
             "Data",
-            "Sensor"
+            # "Sensor"
            }
 
 for datasetName in datasets:

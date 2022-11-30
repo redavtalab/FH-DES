@@ -23,11 +23,24 @@ def read_results(tec_name,datasetName):
     accuracy = pickle.load(poolspec)
     labels = pickle.load(poolspec)
     yhat = pickle.load(poolspec)
-    return accuracy,labels,yhat
+    no_boxes = pickle.load(poolspec)
+
+    return accuracy,labels,yhat, no_boxes
 
 datasets = {
-    "Data10",
-    "Data100"
+    "Data100",
+    "Data1000",
+    "Data10000",
+    "Sensor100",
+    "Sensor1000",
+    "Sensor10000",
+    # "Sensor100000",
+    "Incidents100",
+    "Incidents1000",
+    "Incidents10000",
+    "Agrawal1100",
+    "Agrawal11000",
+    "Agrawal110000",
 }
 
 
@@ -47,17 +60,39 @@ No_methods = len(methods_names)
 ##### Reading Pickle File
 dataset_counter = 0
 overall_results = np.zeros((len(datasets), No_methods, no_itr))
+boxes = np.zeros((len(datasets), No_methods, no_itr))
 for dataInd, datasetName in enumerate(datasets):
     result = []
     for  tecInd, tecName in enumerate(methods_names):
-        accuracy, labels, yhat = read_results(tecName,datasetName)
+        accuracy, labels, yhat,no_boxes = read_results(tecName,datasetName)
         overall_results[dataInd,tecInd,:] = accuracy
+        boxes[dataInd,tecInd,:] = no_boxes
 
 
 ####################################    Write in latex      ###################################################
 mf.write_in_latex_table(overall_results,datasets,methods_names)
+mf.write_in_latex_table(boxes,datasets,methods_names)
 
-##############################################         Win_Tie_Loss           #####################################
+################ plot no_box chart ##############3333333
+no_samples = [100,1000,10000]
+ybox = np.zeros((len(no_samples),))
+for method_ind , tecName in enumerate(methods_names):
+    ybox[0] = np.average([boxes[0,method_ind,0], boxes[3,method_ind,0], boxes[6,method_ind,0], boxes[9,method_ind,0]], )
+    ybox[1] = np.average([boxes[1, method_ind, 0], boxes[4, method_ind, 0], boxes[7, method_ind, 0], boxes[10,method_ind,0]])
+    ybox[2] = np.average([boxes[2, method_ind, 0], boxes[5, method_ind, 0], boxes[8, method_ind, 0], boxes[11,method_ind,0]])
+    plt.plot(no_samples,ybox,label=tecName)
+plt.legend(methods_names)
+plt.xlabel("Number of Samples")
+plt.ylabel("Number of Hyperboxes")
+plt.xticks(no_samples)
+plt.ylim((50,35000))
+plt.xscale("log")
+
+plt.show()
+
+
+
+#############################################         Win_Tie_Loss           #####################################
 compared_index = -1
 # ind_list = list(chain (range(0,3), range(3,len(methods_names)-1)))
 ind_list = range(len(methods_names))

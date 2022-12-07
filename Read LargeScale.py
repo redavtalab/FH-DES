@@ -50,10 +50,9 @@ datasets = sorted(datasets)
 no_itr = 5
 
 ExperimentPath = "LargeScale1"
-# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_2v']
-methods_names = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
-# methods_names = ['FH_1p', 'FH_2p', 'FH_3p', 'FH_4p', 'FH_5p', 'FH_6p', 'FH_7p', 'FH_8p', 'FH_9p', 'FH_10p']
-# methods_names = ['MV', 'SB', 'FMM', 'FH_2v', 'FH_4v','FH_9v']
+# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
+methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+# methods_names = ['MV', 'SB', 'FMM', 'FH_2-M', 'FH_4-M','FH_9-M']
 No_methods = len(methods_names)
 
 
@@ -89,6 +88,22 @@ plt.ylim((50,35000))
 plt.xscale("log")
 
 plt.show()
+for dataInd in range(4):
+
+    for method_ind , tecName in enumerate(methods_names):
+        ybox[0] = boxes[dataInd*3 + 0,method_ind,0]
+        ybox[1] = boxes[dataInd*3 + 1,method_ind,0]
+        ybox[2] = boxes[dataInd*3 + 2,method_ind,0]
+        plt.plot(no_samples,ybox,label=tecName)
+    C_title = ''.join((x for x in datasets[dataInd * 3] if not x.isdigit()))
+    plt.title(C_title)
+    plt.legend(methods_names)
+    plt.xlabel("Number of Samples")
+    plt.ylabel("Number of Hyperboxes")
+    plt.xticks(no_samples)
+    plt.ylim((50,35000))
+    plt.xscale("log")
+    plt.show()
 
 
 

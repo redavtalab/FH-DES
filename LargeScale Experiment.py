@@ -204,8 +204,7 @@ no_itr = 5
 
 
 # methods_names = ['SB','MV', 'Oracle',]
-methods_names = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
-
+methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
 
 NO_techniques = len(methods_names)
 
@@ -213,7 +212,9 @@ start = time.time()
 n_samples_ = [100,1000,10000, 100000, 300000, 500000, 700000,900000 ]
 datasets ={
             "Data",
-            # "Sensor"
+            "Sensor",
+            "Incidents",
+            "Agrawal1"
            }
 
 for datasetName in datasets:

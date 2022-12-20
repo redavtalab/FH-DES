@@ -23,11 +23,24 @@ def read_results(tec_name,datasetName):
     accuracy = pickle.load(poolspec)
     labels = pickle.load(poolspec)
     yhat = pickle.load(poolspec)
-    return accuracy,labels,yhat
+    no_boxes = pickle.load(poolspec)
+
+    return accuracy,labels,yhat, no_boxes
 
 datasets = {
-    "Data10",
-    "Data100"
+    "Data100",
+    "Data1000",
+    "Data10000",
+    "Sensor100",
+    "Sensor1000",
+    "Sensor10000",
+    # "Sensor100000",
+    "Incidents100",
+    "Incidents1000",
+    "Incidents10000",
+    "Agrawal1100",
+    "Agrawal11000",
+    "Agrawal110000",
 }
 
 
@@ -37,27 +50,64 @@ datasets = sorted(datasets)
 no_itr = 5
 
 ExperimentPath = "LargeScale1"
-# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_2v']
-methods_names = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
-# methods_names = ['FH_1p', 'FH_2p', 'FH_3p', 'FH_4p', 'FH_5p', 'FH_6p', 'FH_7p', 'FH_8p', 'FH_9p', 'FH_10p']
-# methods_names = ['MV', 'SB', 'FMM', 'FH_2v', 'FH_4v','FH_9v']
+# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
+methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+# methods_names = ['MV', 'SB', 'FMM', 'FH_2-M', 'FH_4-M','FH_9-M']
 No_methods = len(methods_names)
 
 
 ##### Reading Pickle File
 dataset_counter = 0
 overall_results = np.zeros((len(datasets), No_methods, no_itr))
+boxes = np.zeros((len(datasets), No_methods, no_itr))
 for dataInd, datasetName in enumerate(datasets):
     result = []
     for  tecInd, tecName in enumerate(methods_names):
-        accuracy, labels, yhat = read_results(tecName,datasetName)
+        accuracy, labels, yhat,no_boxes = read_results(tecName,datasetName)
         overall_results[dataInd,tecInd,:] = accuracy
+        boxes[dataInd,tecInd,:] = no_boxes
 
 
 ####################################    Write in latex      ###################################################
 mf.write_in_latex_table(overall_results,datasets,methods_names)
+mf.write_in_latex_table(boxes,datasets,methods_names)
 
-##############################################         Win_Tie_Loss           #####################################
+################ plot no_box chart ##############3333333
+no_samples = [100,1000,10000]
+ybox = np.zeros((len(no_samples),))
+for method_ind , tecName in enumerate(methods_names):
+    ybox[0] = np.average([boxes[0,method_ind,0], boxes[3,method_ind,0], boxes[6,method_ind,0], boxes[9,method_ind,0]], )
+    ybox[1] = np.average([boxes[1, method_ind, 0], boxes[4, method_ind, 0], boxes[7, method_ind, 0], boxes[10,method_ind,0]])
+    ybox[2] = np.average([boxes[2, method_ind, 0], boxes[5, method_ind, 0], boxes[8, method_ind, 0], boxes[11,method_ind,0]])
+    plt.plot(no_samples,ybox,label=tecName)
+plt.legend(methods_names)
+plt.xlabel("Number of Samples")
+plt.ylabel("Number of Hyperboxes")
+plt.xticks(no_samples)
+plt.ylim((50,35000))
+plt.xscale("log")
+
+plt.show()
+for dataInd in range(4):
+
+    for method_ind , tecName in enumerate(methods_names):
+        ybox[0] = boxes[dataInd*3 + 0,method_ind,0]
+        ybox[1] = boxes[dataInd*3 + 1,method_ind,0]
+        ybox[2] = boxes[dataInd*3 + 2,method_ind,0]
+        plt.plot(no_samples,ybox,label=tecName)
+    C_title = ''.join((x for x in datasets[dataInd * 3] if not x.isdigit()))
+    plt.title(C_title)
+    plt.legend(methods_names)
+    plt.xlabel("Number of Samples")
+    plt.ylabel("Number of Hyperboxes")
+    plt.xticks(no_samples)
+    plt.ylim((50,35000))
+    plt.xscale("log")
+    plt.show()
+
+
+
+#############################################         Win_Tie_Loss           #####################################
 compared_index = -1
 # ind_list = list(chain (range(0,3), range(3,len(methods_names)-1)))
 ind_list = range(len(methods_names))

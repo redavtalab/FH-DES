@@ -87,13 +87,9 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
 
     FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=.6, mu=.1, mis_sample_based=True,
                      doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_2v = FHDES_JFB_vector(pool_classifiers, k=k, theta=0.001, mu=.4, mis_sample_based=True,
-                     doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
 
     FH_3v = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=.5, mu=.3, mis_sample_based=True,
                           doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_4v = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=0.001, mu=.1, mis_sample_based=True,
-                          doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
 
     FH_5v = FHDES_JFB_vector(pool_classifiers, k=k, theta=.7, mu=.1, mis_sample_based=True,
                      doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
@@ -101,15 +97,9 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     FH_6v = DESFHMW_JFB_vector(pool_classifiers, k=k, theta=.7, mu=.5, mis_sample_based=True,
                        doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_7v = FHDES_Allboxes_vector(pool_classifiers, k=k, theta=.4, mu=.4, mis_sample_based=True,
-                          doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
     FH_8v = DESFHMW_allboxes_vector(pool_classifiers, k=k, theta=.5, mu=.4, mis_sample_based=True,
                             doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-    FH_9v = FHDES_prior_vector(pool_classifiers, k=k, theta=.7, mu=.7, mis_sample_based=True,
-                       doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
-    FH_10v = DESFHMW_prior_vector(pool_classifiers, k=k, theta=.9, mu=.7, mis_sample_based=True,
-                          doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
 
     oracle = Oracle(pool_classifiers)
@@ -119,10 +109,6 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     list_ds = [FH_1v, FH_3v, FH_5v, FH_6v,  FH_8v]
     # list_ds = [FH_1v, FH_2v, FH_3v, FH_4v, FH_5v, FH_6v, FH_7v, FH_8v, FH_9v, FH_10v]
 
-    # fit the ds techniques
-    # for ds in list_ds:
-    #     if ds != majority_voting:
-    #         ds.fit(X_DSEL, y_DSEL)
 
 
     return list_ds, methods_names

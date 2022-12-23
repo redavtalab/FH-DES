@@ -86,10 +86,10 @@ datasets = sorted(datasets)
 no_itr = 20
 
 ExperimentPath = "Experiment1"
-# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4v']
-methods_v = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
-methods_p = ['FH_1p', 'FH_2p', 'FH_3p', 'FH_4p', 'FH_5p', 'FH_6p', 'FH_7p', 'FH_8p', 'FH_9p', 'FH_10p']
-# methods_names = ['MV', 'SB', 'FH_5v']
+# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
+methods_v = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+methods_p = ['FH_1-c', 'FH_2-c', 'FH_3-c', 'FH_4-c', 'FH_5-c', 'FH_6-c', 'FH_7-c', 'FH_8-c', 'FH_9-c', 'FH_10-c']
+# methods_names = ['MV', 'SB', 'FH_5-M']
 No_methods = len(methods_v)
 
 
@@ -157,12 +157,12 @@ for ind in ind_list:
 
 nc = no_exp/2 + 1.645*np.sqrt(no_exp)/2
 met_list = [methods_p[i] for i in ind_list[:-1]]
-mf.plot_winloss_2(methods_v,methods_p ,win,tie,loss,nc, without_tie = False)
+# mf.plot_winloss_2(methods_v,methods_p ,win,tie,loss,nc, without_tie = False)
 
 
 ############################ Ranking - CD diagram  ############################
-methods_names = ['FH_1p', 'FH_2p', 'FH_3p', 'FH_4p', 'FH_5p', 'FH_6p', 'FH_7p', 'FH_8p', 'FH_9p', 'FH_10p', 'FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
-# methods_names = ['MV//////////////', 'SB', 'FMM', 'FH_2v', 'FH_4v','FH_9v']
+methods_names = ['FH_1-c', 'FH_2-c', 'FH_3-c', 'FH_4-c', 'FH_5-c', 'FH_6-c', 'FH_7-c', 'FH_8-c', 'FH_9-c', 'FH_10-c', 'FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+# methods_names = ['MV//////////////', 'SB', 'FMM', 'FH_2-M', 'FH_4-M','FH_9-M']
 No_methods = len(methods_names)
 
 

@@ -31,16 +31,19 @@ datasets = {
     "Data100",
     "Data1000",
     "Data10000",
+    "Data100000",
     "Sensor100",
     "Sensor1000",
     "Sensor10000",
-    # "Sensor100000",
+    "Sensor100000",
     "Incidents100",
     "Incidents1000",
     "Incidents10000",
+    "Incidents100000",
     "Agrawal1100",
     "Agrawal11000",
     "Agrawal110000",
+    "Agrawal1100000",
 }
 
 
@@ -51,7 +54,7 @@ no_itr = 5
 
 ExperimentPath = "LargeScale1"
 # methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
-methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+methods_names = ['FH_1-M',  'FH_3-M', 'FH_5-M', 'FH_6-M', 'FH_8-M']
 # methods_names = ['MV', 'SB', 'FMM', 'FH_2-M', 'FH_4-M','FH_9-M']
 No_methods = len(methods_names)
 
@@ -76,9 +79,9 @@ mf.write_in_latex_table(boxes,datasets,methods_names)
 no_samples = [100,1000,10000]
 ybox = np.zeros((len(no_samples),))
 for method_ind , tecName in enumerate(methods_names):
-    ybox[0] = np.average([boxes[0,method_ind,0], boxes[3,method_ind,0], boxes[6,method_ind,0], boxes[9,method_ind,0]], )
-    ybox[1] = np.average([boxes[1, method_ind, 0], boxes[4, method_ind, 0], boxes[7, method_ind, 0], boxes[10,method_ind,0]])
-    ybox[2] = np.average([boxes[2, method_ind, 0], boxes[5, method_ind, 0], boxes[8, method_ind, 0], boxes[11,method_ind,0]])
+    ybox[0] = np.average([boxes[0,method_ind,0], boxes[4,method_ind,0], boxes[8,method_ind,0], boxes[12,method_ind,0]], )
+    ybox[1] = np.average([boxes[1, method_ind, 0], boxes[5, method_ind, 0], boxes[9, method_ind, 0], boxes[13,method_ind,0]])
+    ybox[2] = np.average([boxes[2, method_ind, 0], boxes[6, method_ind, 0], boxes[10, method_ind, 0], boxes[14,method_ind,0]])
     plt.plot(no_samples,ybox,label=tecName)
 plt.legend(methods_names)
 plt.xlabel("Number of Samples")
@@ -91,11 +94,11 @@ plt.show()
 for dataInd in range(4):
 
     for method_ind , tecName in enumerate(methods_names):
-        ybox[0] = boxes[dataInd*3 + 0,method_ind,0]
-        ybox[1] = boxes[dataInd*3 + 1,method_ind,0]
-        ybox[2] = boxes[dataInd*3 + 2,method_ind,0]
+        ybox[0] = boxes[dataInd*4 + 0,method_ind,0]
+        ybox[1] = boxes[dataInd*4 + 1,method_ind,0]
+        ybox[2] = boxes[dataInd*4 + 2,method_ind,0]
         plt.plot(no_samples,ybox,label=tecName)
-    C_title = ''.join((x for x in datasets[dataInd * 3] if not x.isdigit()))
+    C_title = ''.join((x for x in datasets[dataInd * 4] if not x.isdigit()))
     plt.title(C_title)
     plt.legend(methods_names)
     plt.xlabel("Number of Samples")

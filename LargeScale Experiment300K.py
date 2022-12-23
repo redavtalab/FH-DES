@@ -165,6 +165,7 @@ def model_setup(datasetName, no_samples):
         yhat = []
         noBoxes = 0
         for itr in range(no_itr):
+            print(itr)
             [X_train, X_test, X_DSEL, y_train, y_test, y_DSEL] = np.load('Datasets3/' + datasetName + str(itr) + '.npy',  allow_pickle=True)
             X_DSEL = X_DSE[:no_samples, :]
             y_DSEL = y_DSE[:no_samples]

@@ -26,7 +26,9 @@ class FHDES_Allboxes_vector(BaseDES):
                  doContraction = True,
                  thetaCheck = True,
                  multiCore_process = False,
-                 shuffle_dataOrder = False):
+                 shuffle_dataOrder = False,
+                 Lambda = 0.9):
+
         self.theta = theta
         self.mu = mu
         self.mis_sample_based = mis_sample_based
@@ -36,7 +38,7 @@ class FHDES_Allboxes_vector(BaseDES):
         self.thetaCheck = thetaCheck
         self.multiCore_process = multiCore_process
         self.shuffle_dataOrder = shuffle_dataOrder
-
+        self.Lambda = Lambda
         ############### it should be based on Clustering #############################
         super(FHDES_Allboxes_vector, self).__init__(pool_classifiers=pool_classifiers,
                                     with_IH=with_IH,
@@ -197,14 +199,17 @@ class FHDES_Allboxes_vector(BaseDES):
                 hboxW[0, :] = X
                 continue
 
-            # X is in a box?
-            is_inBox = False
-            for boxInd in range(len(hboxV)):
-                if self.is_inside(hboxV, hboxW, boxInd,X):
-                    is_inBox = True
-                    break
-            if is_inBox:
-                # nop
+            ## X is in a box?
+            # is_inBox = False
+            # for boxInd in range(len(hboxV)):
+            #     if self.is_inside(hboxV, hboxW, boxInd,X):
+            #         is_inBox = True
+            #         break
+            # if is_inBox:
+            #     # nop
+            #     continue
+            memberships = self.membership_boxes(hboxV,hboxW,X)
+            if np.max(memberships) >= self.Lambda:
                 continue
 
             ######################## Expand ############################

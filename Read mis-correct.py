@@ -88,7 +88,7 @@ no_itr = 20
 ExperimentPath = "Experiment1"
 # methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
 methods_v = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
-methods_p = ['FH_1-c', 'FH_2-c', 'FH_3-c', 'FH_4-c', 'FH_5-c', 'FH_6-c', 'FH_7-c', 'FH_8-c', 'FH_9-c', 'FH_10-c']
+methods_p = ['FH_1-C', 'FH_2-C', 'FH_3-C', 'FH_4-C', 'FH_5-C', 'FH_6-C', 'FH_7-C', 'FH_8-C', 'FH_9-C', 'FH_10-C']
 # methods_names = ['MV', 'SB', 'FH_5-M']
 No_methods = len(methods_v)
 
@@ -111,7 +111,7 @@ for dataInd, datasetName in enumerate(datasets):
         overall_results_p[dataInd,tecInd,:] = accuracy
 
  ##### Adding IJCNN Results
-if(methods_v[0] == "FH_1v" or methods_v[0] == "FH_1"):
+if(methods_v[0] == "FH_1-M" or methods_v[0] == "FH_1"):
 
     overall_results_v[:, 0, 0] = [96.87, 89.5, 99.34, 76.55, 96.61, 74.11, 91.29, 70.38, 74.86, 71.56, 83.09, 70.65,
                                 88.13, 82.5, 71.8, 90.5, 69.14, 78.87, 87.64, 78.1, 76.28, 79.62, 75.08, 71.37, 95.98,
@@ -121,7 +121,7 @@ if(methods_v[0] == "FH_1v" or methods_v[0] == "FH_1"):
     sd1 = [0.92, 1.68, 0.50, 2.64, 1.61, 1.25, 3.63, 2.03, 2.27, 3.98, 4.42, 2.59, 1.37, 3.49, 4.08, 2.32, 4.34, 2.73,
            3.24, 0.91, 2.72, 5.42, 2.00, 1.33, 1.37, 2.41, 3.23, 3.09, 4.39, 1.71]
 
-if (methods_p[0] == "FH_1p" or methods_p[0] == "FH_1"):
+if (methods_p[0] == "FH_1-C" or methods_p[0] == "FH_1"):
 
     overall_results_p[:, 0, 0] = [96.87, 89.12, 99.13, 77.46, 96.28, 74.63, 87.77, 70.12, 74.8, 71.36, 82.79, 71.3,
                                   88.35, 81.94, 71.01, 89.63, 67.82, 78.03, 86.2, 77.81, 74.9, 81.35, 75.26, 70.72,
@@ -157,11 +157,12 @@ for ind in ind_list:
 
 nc = no_exp/2 + 1.645*np.sqrt(no_exp)/2
 met_list = [methods_p[i] for i in ind_list[:-1]]
+mf.plot_winloss(methods_v,win,tie,loss,nc,without_tie=False)
 # mf.plot_winloss_2(methods_v,methods_p ,win,tie,loss,nc, without_tie = False)
 
 
 ############################ Ranking - CD diagram  ############################
-methods_names = ['FH_1-c', 'FH_2-c', 'FH_3-c', 'FH_4-c', 'FH_5-c', 'FH_6-c', 'FH_7-c', 'FH_8-c', 'FH_9-c', 'FH_10-c', 'FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+methods_names = ['FH_1-C', 'FH_2-C', 'FH_3-C', 'FH_4-C', 'FH_5-C', 'FH_6-C', 'FH_7-C', 'FH_8-C', 'FH_9-C', 'FH_10-C', 'FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
 # methods_names = ['MV//////////////', 'SB', 'FMM', 'FH_2-M', 'FH_4-M','FH_9-M']
 No_methods = len(methods_names)
 
@@ -188,7 +189,7 @@ errors_mat = 100 - dataset_methods_acc
 
 d_ranks = rankdata(errors_mat,axis=1)
 
-ranks = np.average(d_ranks,axis=0) - 1
+ranks = np.average(d_ranks,axis=0)
 # m_list = [methods_names[i] for i in range(No_methods)]
 # mf.plot_CD(m_list,ranks,len(datasets))
 

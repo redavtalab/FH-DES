@@ -86,10 +86,10 @@ datasets = sorted(datasets)
 no_itr = 20
 
 ExperimentPath = "Experiment1"
-methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_2v']
-# methods_names = ['FH_1v', 'FH_2v', 'FH_3v', 'FH_4v', 'FH_5v', 'FH_6v', 'FH_7v', 'FH_8v', 'FH_9v', 'FH_10v']
-# methods_names = ['FH_1p', 'FH_2p', 'FH_3p', 'FH_4p', 'FH_5p', 'FH_6p', 'FH_7p', 'FH_8p', 'FH_9p', 'FH_10p']
-# methods_names = ['MV', 'SB', 'FMM', 'FH_2v', 'FH_4v','FH_9v']
+# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
+methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+# methods_names = ['FH_1-C', 'FH_2-C', 'FH_3-C', 'FH_4-C', 'FH_5-C', 'FH_6-C', 'FH_7-C', 'FH_8-C', 'FH_9-C', 'FH_10-C']
+# methods_names = ['MV', 'SB', 'GFMM', 'FH_4-M']
 No_methods = len(methods_names)
 
 
@@ -104,7 +104,7 @@ for dataInd, datasetName in enumerate(datasets):
 
 
  ##### Adding IJCNN Results
-if(methods_names[0] == "FH_1v" or methods_names[0] == "FH_1"):
+if(methods_names[0] == "FH_1-M" or methods_names[0] == "FH_1"):
 
         overall_results[:, 0, 0] = [96.87, 89.5, 99.34, 76.55, 96.61, 74.11, 91.29, 70.38, 74.86, 71.56, 83.09, 70.65,
                                     88.13, 82.5, 71.8, 90.5, 69.14, 78.87, 87.64, 78.1, 76.28, 79.62, 75.08, 71.37, 95.98,
@@ -156,13 +156,14 @@ mf.plot_winloss(met_list ,win,tie,loss,nc, without_tie = False)
 
 ############################ Ranking - CD diagram  ############################
 
-d_ranks = np.zeros_like(overall_results[:,0:-1,0])
+# d_ranks = np.zeros_like(overall_results[:,0:-1,0])  # When the list includes the Oracle
 # errors_mat = 100 - np.delete(dataset_methods_acc,2,1)
+
+d_ranks = np.zeros_like(overall_results[:,:,0]) # When the list does not include the Oracle
+
 errors_mat = 100 - dataset_methods_acc
-
 d_ranks = rankdata(errors_mat,axis=1)
-
-ranks = np.average(d_ranks,axis=0) - 1
+ranks = np.average(d_ranks,axis=0)
 # m_list = [methods_names[i] for i in chain(range(2),range(3,No_methods))]
 m_list = [methods_names[i] for i in range(No_methods)]
 mf.plot_CD(m_list,ranks,len(datasets))

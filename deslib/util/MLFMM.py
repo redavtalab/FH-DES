@@ -17,10 +17,21 @@ class MLFMM:
         if torch.cuda.is_available():
             self.V = torch.cuda.FloatTensor()
             self.W = torch.cuda.FloatTensor()
+            self.Cls = torch.cuda.IntTensor()
         else:
             self.V = torch.FloatTensor()
             self.W = torch.FloatTensor()
+            self.Cls = torch.IntTensor()
         self.n_features_ = None
+
+    def is_expandable(self, boxInd, x):
+        candV = np.minimum(self.V[boxInd], x)
+        candW = np.maximum(self.W[boxInd], x)
+        return all((candW-candV) < self.theta)
+
+    def expand_box(self, boxInd, x):
+        self.V[boxInd] = np.minimum(self.V[boxInd],x)
+        self.W[boxInd] = np.maximum(self.W[boxInd], x)
 
     def membership(self,x_q):
         NO_hypeboxes, n_features = self.V.shape
@@ -36,6 +47,116 @@ class MLFMM:
         m = 1 - dd  # m: membership
         m = np.power(m, 6)
         return m
+
+    def overlap_contract(self, index):
+        '''
+        Check if any classwise dissimilar hyperboxes overlap
+        '''
+        contracted = False
+        for test_box in range(len(self.hyperboxes)):
+
+            if self.classes[test_box] == self.classes[index]:
+                # Ignore same class hyperbox overlap
+                continue
+
+            expanded_box = self.hyperboxes[index]
+            box = self.hyperboxes[test_box]
+
+           
+            vj, wj = expanded_box
+            vk, wk = box
+
+            delta_new = delta_old = 1
+            min_overlap_index = -1
+            for i in range(len(vj)):
+                if vj[i] < vk[i] < wj[i] < wk[i]:
+                    delta_new = min(delta_old, wj[i] - vk[i])
+
+                elif vk[i] < vj[i] < wk[i] < wj[i]:
+                    delta_new = min(delta_old, wk[i] - vj[i])
+
+                elif vj[i] < vk[i] < wk[i] < wj[i]:
+                    delta_new = min(delta_old, min(wj[i] - vk[i], wk[i] - vj[i]))
+
+                elif vk[i] < vj[i] < wj[i] < wk[i]:
+                    delta_new = min(delta_old, min(wj[i] - vk[i], wk[i] - vj[i]))
+
+                if delta_old - delta_new > 0:
+                    min_overlap_index = i
+                    delta_old = delta_new
+
+            if min_overlap_index >= 0:
+                i = min_overlap_index
+                # We need to contract the expanded box
+                if vj[i] < vk[i] < wj[i] < wk[i]:
+                    vk[i] = wj[i] = (vk[i] + wj[i])/2
+
+                elif vk[i] < vj[i] < wk[i] < wj[i]:
+                    vj[i] = wk[i] = (vj[i] + wk[i])/2
+
+                elif vj[i] < vk[i] < wk[i] < wj[i]:
+                    if (wj[i] - vk[i]) > (wk[i] - vj[i]):
+                        vj[i] = wk[i]
+
+                    else:
+                        wj[i] = vk[i]
+
+                elif vk[i] < vj[i] < wj[i] < wk[i]:
+                    if (wk[i] - vj[i]) > (wj[i] - vk[i]):
+                        vk[i] = wj[i]
+
+                    else:
+                        wk[i] = vj[i]
+
+                self.hyperboxes[test_box] = np.array([vk, wk])
+                self.hyperboxes[index] = np.array([vj, wj])
+                contracted = True
+
+        return contracted
+
+
+    def setup_hyperboxs(self, X,y):
+
+        for ind, x_t in enumerate(X):
+            # Creation first box
+            if self.V == None:
+                self.V[0, :] = x_t
+                self.W[0, :] = x_t
+                self.Cls[0] = y[ind]
+                continue
+
+            # Is x_t located inside a box?
+            memberships = self.membership(x_t)
+            if np.max(memberships) >= 1:
+                continue
+
+            ######################## Expand ############################
+            # Sort boxes by the distances
+            hboxC = (self.V + self.W) / 2
+            expanded = False
+
+            # Filter the same class hyperboxes:
+            #
+            #
+            #
+
+
+            box_list = np.linalg.norm(x_t - hboxC, axis=1)
+
+            sorted_indexes = np.argsort(box_list)[::-1]
+            for ind in sorted_indexes:
+                if self.is_expandable(ind, x_t):
+                    self.expand_box(ind, x_t)
+                    expanded = True
+                    break
+
+            ######################## Creation ############################
+            #  If any hyperbox didn't expand
+            if expanded == False:
+                box = x_t.reshape(1, self.n_features_)
+                self.V = np.concatenate((self.V, box))
+                self.W = np.concatenate((self.W, box))
+
 
     def fit(self, X, y):
         # implementation of the fit method

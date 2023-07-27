@@ -253,7 +253,8 @@ do_train = True
 do_evaluate = True
 
 # methods_names = ['SB','MV', 'Oracle',]
-methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
+# methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
 # methods_names = ['FH_1-C', 'FH_2-C', 'FH_3-C', 'FH_4-C', 'FH_5-C', 'FH_6-C', 'FH_7-C', 'FH_8-C', 'FH_9-C', 'FH_10-C']
 NO_techniques = len(methods_names)
 

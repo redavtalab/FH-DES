@@ -5,9 +5,6 @@ import pandas as pd
 
 import myfunctions as mf
 from scipy.stats import rankdata
-#import pandas as pd
-#import openml
-#from openml.tasks import TaskType
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 from matplotlib.ticker import FuncFormatter
@@ -15,8 +12,6 @@ import numpy as np
 import math
 from itertools import chain
 #methods_names = ['KNORA-U', 'OLA', 'DES-KNN','META-DES', 'FH-DES_W', 'FH-DES_M']
-#datasets = {"Circle", "P2"}
-#datasets = { "Thyroid","Breast","Wine","Heart"}
 def read_results(tec_name,datasetName):
     path = ExperimentPath + "/Results/" + tec_name +"_"+datasetName + "_result.p"
     poolspec = open(path, mode="rb")
@@ -26,7 +21,6 @@ def read_results(tec_name,datasetName):
     return accuracy,labels,yhat
 
 datasets = {
-#     Data set of DGA1033 report
 "Audit",
 "Banana",
 "Banknote",
@@ -57,37 +51,15 @@ datasets = {
 "Voice3",
 "Weaning",
 "Wine"
-
-
-#
-# "Adult",
-# "Audit2",
-# "Cardiotocography",
-# "Chess",
-# "Credit-screening",
-# "CTG",
-# "Ecoli",
-# "Glass",
-# "Pima",
-# "Transfusion"
-
- # "Wholesale",
-    #  "Transfusion", low oracle accuracy
-
-    # 30 Dataset
-    # Has problem: "Adult", "Glass",  "Ecoli",    "Seeds",         "Voice9"
-    # Large: "Magic", "CTG",  "Segmentation", "WDVG1",
 }
 
-
 datasets = sorted(datasets)
-# mf.print_dataset_table(datasets)
 
 no_itr = 20
 
 ExperimentPath = "Experiment1"
-# methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
-methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
+methods_names = ['KNORA-U', 'KNORA-E', 'MCB', 'DESKNN', 'OLA', 'RANK', 'KNOP', 'META-DES','FH_4-M']
+# methods_names = ['FH_1-M', 'FH_2-M', 'FH_3-M', 'FH_4-M', 'FH_5-M', 'FH_6-M', 'FH_7-M', 'FH_8-M', 'FH_9-M', 'FH_10-M']
 # methods_names = ['FH_1-C', 'FH_2-C', 'FH_3-C', 'FH_4-C', 'FH_5-C', 'FH_6-C', 'FH_7-C', 'FH_8-C', 'FH_9-C', 'FH_10-C']
 # methods_names = ['MV', 'SB', 'GFMM', 'FH_4-M']
 No_methods = len(methods_names)
@@ -134,8 +106,6 @@ mf.plot_winloss(met_list ,win,tie,loss,nc, without_tie = False)
 
 ############################ Ranking - CD diagram  ############################
 
-# d_ranks = np.zeros_like(overall_results[:,0:-1,0])  # When the list includes the Oracle
-# errors_mat = 100 - np.delete(dataset_methods_acc,2,1)
 
 d_ranks = np.zeros_like(overall_results[:,:,0]) # When the list does not include the Oracle
 
@@ -151,7 +121,6 @@ np.average(rankdata(np.average(overall_results, axis=2), axis=1), axis=0)
 np.average(rankdata(np.average(overall_results, axis=2), axis=1), axis=0)
 print("Overal Accuracy:")
 scores = np.average(np.average(overall_results, axis=2), axis=0)
-# sc = np.concatenate((scores[:2],scores[3:]))
-# scores[0] = 81.89
+
 mf.plot_overallresult(scores, methods_names)
 print(np.round(ranks,2))

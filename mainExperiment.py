@@ -82,7 +82,7 @@ def initialize_ds(pool_classifiers, X_DSEL, y_DSEL, k=7):
     # FH_10p = DESFHMW_prior_vector(pool_classifiers, k=k, theta=.8, mu=.6, mis_sample_based=False,
     #                               doContraction=True, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
 
-FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=.6, mu=.1, mis_sample_based=True,
+    FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=.6, mu=.1, mis_sample_based=True,
                      doContraction=False, thetaCheck=True, multiCore_process=True, shuffle_dataOrder=False)
     FH_2v = FHDES_JFB_vector(pool_classifiers, k=k, theta=0.001, mu=.4, mis_sample_based=True,
                      doContraction=True, thetaCheck=False, multiCore_process=True, shuffle_dataOrder=False)
@@ -115,7 +115,8 @@ FH_1v = FHDES_JFB_vector(pool_classifiers, k=k, theta=.6, mu=.1, mis_sample_base
 
     # list_ds = [majority_voting, oracle]
     # list_ds = [FH_1v, FH_2v, FH_3v, FH_4v, FH_5v, FH_6v, FH_7v, FH_8v, FH_9v, FH_10v]
-    list_ds = [FH_1p, FH_2p, FH_3p, FH_4p, FH_5p, FH_6p, FH_7p, FH_8p, FH_9p, FH_10p]
+    # list_ds = [FH_1p, FH_2p, FH_3p, FH_4p, FH_5p, FH_6p, FH_7p, FH_8p, FH_9p, FH_10p]
+    list_ds = [knorau, kne, mcb, desknn, ola, rank, knop, meta, FH_4v]
 
     # fit the ds techniques
     for ds in list_ds:
@@ -273,35 +274,3 @@ for datasetName in datasets:
         print("Test time", time.time() - t1)
 
 
-
-
-# datasets = sorted(datasets)
-# NO_datasets = len(datasets)
-# whole_results = np.zeros([NO_datasets,NO_techniques,no_itr])
-# dataset_count = 0
-# done_list = []
-#
-#
-# print(f"Time taken = {time.time() - start: .10f}")
-# # write_whole_results_into_excel(whole_results, done_list.copy(), methods_names)
-# path = ExperimentPath + "WholeResults.p"
-# rfile = open(path, mode="wb")
-# pickle.dump(whole_results,rfile)
-# datasets = done_list
-# pickle.dump(datasets,rfile)
-# pickle.dump(methods_names,rfile)
-# rfile.close()
-#
-#
-# # pdata = np.concatenate((whole_results[:,0:3 ,:],whole_results[:,10 :14,:],whole_results[:,21:22,:]) , axis=1)
-# # metName = methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]
-# # write_in_latex_table(pdata,done_list,metName,rows="datasets")
-# write_in_latex_table(whole_results,done_list,methods_names,rows="datasets")
-#
-#
-# duration = 4  # seconds
-# freq = 440  # Hz
-# os.system('play -nq -t alsa synth {} sine {}'.format(duration, freq))
-# print("STD:" , np.average(np.std(whole_results,2),0))
-#
-# # methods_names[0:3]+ methods_names[10:14] + methods_names[21:22]
